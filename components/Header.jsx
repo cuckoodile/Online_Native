@@ -1,0 +1,69 @@
+import { View, Text, Pressable } from "react-native";
+import React, { useState } from "react";
+
+import Ionicons from "react-native-vector-icons/Ionicons";
+
+import Sidebar from "./Sidebar";
+import { useNavigation, router } from "expo-router";
+
+export default function Header() {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const navigate = useNavigation();
+
+  const handleNavigation = (path, params) => {
+    if (params?.id) {
+      router.replace(`/${params.id}`);
+    } else {
+      router.replace(`/${path}`);
+    }
+  };
+
+  return (
+    <View
+      style={{
+        backgroundColor: "lightgreen",
+        position: "absolute",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+        top: 0,
+        left: 0,
+        paddingHorizontal: 10,
+        zIndex: 10,
+      }}
+    >
+      <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("")}>
+        <Text>DevSix</Text>
+      </Pressable>
+
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        <Pressable
+          style={{ padding: 5 }}
+          android_ripple={{ color: "grey" }}
+          onPress={() => handleNavigation("cart")}
+        >
+          <Ionicons name="cart-outline" size={27} color="black" />
+        </Pressable>
+
+        <Pressable
+          style={{ padding: 5 }}
+          android_ripple={{ color: "grey" }}
+          onPress={() => handleNavigation("[id]", { id: "3" })}  // Replace this with the current user ID
+        >
+          <Ionicons name="person-circle-outline" size={27} color="black" />
+        </Pressable>
+
+        <Pressable
+          style={{ padding: 5 }}
+          android_ripple={{ color: "grey" }}
+          onPress={() => setSidebarOpen(!isSidebarOpen)}
+        >
+          <Ionicons name="menu" size={27} color="black" />
+        </Pressable>
+      </View>
+
+      <Sidebar isOpen={isSidebarOpen} onOpenChange={setSidebarOpen} />
+    </View>
+  );
+}
