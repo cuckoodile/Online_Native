@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import React, { useState } from "react";
 
+import { useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Sidebar from "./Sidebar";
@@ -9,7 +10,7 @@ import { useNavigation, router } from "expo-router";
 export default function Header() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const navigate = useNavigation();
+  const netInfo = useSelector((state) => state.netInfo);
 
   const handleNavigation = (path, params) => {
     if (params?.id) {
@@ -23,9 +24,10 @@ export default function Header() {
     <View
       style={{
         backgroundColor: "lightgreen",
-        position: "absolute",
+        position: "sticky",
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
         width: "100%",
         top: 0,
         left: 0,
@@ -37,7 +39,9 @@ export default function Header() {
         <Text>DevSix</Text>
       </Pressable>
 
-      <View style={{ flexDirection: "row", gap: 5 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+        <Ionicons name={netInfo.isConnected ? "wifi-outline" : "cloud-offline-outline"} size={27} color="black" />
+
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
@@ -49,7 +53,7 @@ export default function Header() {
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
-          onPress={() => handleNavigation("[id]", { id: "3" })}  // Replace this with the current user ID
+          onPress={() => handleNavigation("[id]", { id: "3" })} // Replace this with the current user ID
         >
           <Ionicons name="person-circle-outline" size={27} color="black" />
         </Pressable>
