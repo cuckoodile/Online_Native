@@ -77,6 +77,14 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             <Text>Cart</Text>
           </Pressable>
 
+          <Pressable
+            onPress={() => {
+              handleNavigation("admin");
+            }}
+          >
+            <Text>Admin</Text>
+          </Pressable>
+
           {/* Replace the params id with the current user ID */}
           <Link
             href={{ pathname: "/[id]", params: { id: "4" } }}
