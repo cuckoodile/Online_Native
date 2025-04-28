@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import {
   Image,
   Pressable,
@@ -6,9 +6,16 @@ import {
   ScrollView,
   Text,
   View,
+  Dimensions,
+  TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
+// import Carousel from "react-native-reanimated-carousel";
+
+import MyCarousel from "../components/MyCarousel";
+import Card from "../components/Card";
 import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* 
@@ -21,6 +28,29 @@ import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context
 
 export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
+
+  const carouselData = [
+    {
+      id: 1,
+      image: "https://picsum.photos/seed/1/3000/2000",
+    },
+    {
+      id: 2,
+      image: "https://picsum.photos/seed/2/3000/2000",
+    },
+    {
+      id: 3,
+      image: "https://picsum.photos/seed/3/3000/2000",
+    },
+    {
+      id: 4,
+      image: "https://picsum.photos/seed/4/3000/2000",
+    },
+    {
+      id: 5,
+      image: "https://picsum.photos/seed/5/3000/2000",
+    },
+  ];
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -95,6 +125,7 @@ export default function Index() {
         justifyContent: "center",
         alignItems: "center",
         flex: 1,
+        paddingTop: 5,
       }}
     >
       <ScrollView
@@ -103,12 +134,15 @@ export default function Index() {
         }
         style={{ width: "100%" }}
       >
+        {/* Carousel */}
+        <MyCarousel carouselData={carouselData} />
+
         <View style={{ backgroundColor: "blue", width: "100%", height: 400 }}>
           <Text style={{ color: "white" }}>This is the landing page.</Text>
         </View>
         <View
           style={{
-            width: "100%",
+            // width: "100%",
             paddingHorizontal: 10,
             paddingVertical: 30,
             gap: 10,
@@ -124,89 +158,4 @@ export default function Index() {
   );
 }
 
-function Card({ item = [], cart = [] }) {
-  const [onCart, setCart] = useState(cart.includes(item.id) ? true : false);
-
-  const cartSize = 23;
-
-  function handleCartClick() {
-    setCart(!onCart);
-  }
-
-  return (
-    <View
-      style={{
-        backgroundColor: "rgb(192, 207, 178)",
-        overflow: "hidden",
-        elevation: 10,
-        borderRadius: 10,
-      }}
-    >
-      <Pressable
-        android_ripple={{ color: "black" }}
-        onPress={() => console.log("clicked id: ", item.id)}
-      >
-        {/* Image */}
-        <View
-          style={{
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 170,
-          }}
-        >
-          <Image
-            source="https://picsum.photos/seed/696/3000/2000"
-            style={{
-              backgroundColor: "red",
-              width: "100%",
-              height: "100%",
-            }}
-          />
-        </View>
-
-        {/* Text Wrapper */}
-        <View
-          style={{
-            flex: 1,
-            padding: 10,
-            gap: 5,
-          }}
-        >
-          <Text style={{ color: "green" }}>
-            {item?.category ?? "No category!"}
-          </Text>
-
-          <Text>{item?.title ?? "No title!"}</Text>
-
-          {/* Price and Cart */}
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text style={{ color: "green" }}>
-              P{item?.price ?? "No price!"}
-            </Text>
-
-            <Pressable onPress={() => handleCartClick()}>
-              <View
-                style={{
-                  width: cartSize * 1.7,
-                  height: cartSize * 1.7,
-                  borderRadius: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderWidth: 1,
-                }}
-              >
-                <Ionicons
-                  name={onCart ? "checkmark" : "cart-outline"}
-                  size={cartSize}
-                />
-              </View>
-            </Pressable>
-          </View>
-        </View>
-      </Pressable>
-    </View>
-  );
-}
+<Card />;
