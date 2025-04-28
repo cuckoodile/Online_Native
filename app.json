@@ -11,7 +11,7 @@
 
    "splash": {
       "image": "./assets/images/devsix.jpg",  
-      "backgroundColor": "#058743",      
+      "backgroundColor": "#084c3c",      
       "resizeMode": "contain",
       "imageWidth": 200
     },
@@ -34,7 +34,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/devsix2.png",
+          "image": "./assets/images/devsix.jpg",
           "imageWidth": 200,
           "resizeMode": "contain"
         }

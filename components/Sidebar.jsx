@@ -50,7 +50,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
       }}
     >
       <Pressable style={styles.overlay} onPress={() => onOpenChange(false)} />
-      <Animated.View style={[styles.sidebar, { transform: [{ translateX }], backgroundColor: "#058743", paddingTop: insets.top }]}>
+      <Animated.View style={[styles.sidebar, { transform: [{ translateX }], backgroundColor: "#084c3c", paddingTop: insets.top }]}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>
           Sidebar Navigations
         </Text>

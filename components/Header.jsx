@@ -25,7 +25,7 @@ export default function Header() {
   return (
     <View
       style={{
-        backgroundColor: "#058743",
+        backgroundColor: "#084c3c",
         position: "sticky",
         flexDirection: "row",
         justifyContent: "space-between",

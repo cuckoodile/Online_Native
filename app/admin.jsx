@@ -35,11 +35,25 @@ const Dashboard = () => {
     ],
   };
 
+  const handleProductManagementPress = () => {
+    console.log('Product Management button pressed');
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.header}>Overview</Text>
-        <Text style={styles.subheader}>Welcome back, Admin! Here's what's happening today.</Text>
+        <View style={styles.headerRow}>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.header}>Overview</Text>
+            <Text style={styles.subheader}>Welcome back, Admin! Here's what's happening today.</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.productManagementButton}
+            onPress={handleProductManagementPress}
+          >
+            <Text style={styles.productManagementButtonText}>Product Management</Text>
+          </TouchableOpacity>
+        </View>
         
         <View style={styles.statsContainer}>
           {stats.map((stat, index) => (
@@ -90,8 +104,7 @@ const Dashboard = () => {
           bezier
           style={styles.chart}
         />
-      </View>
-      <View style={styles.section}>
+        <View style={styles.section}>
         <Text style={styles.header}>Sales Target</Text>
         <View style={styles.targetCard}>
           <View style={styles.targetRow}>
@@ -119,6 +132,7 @@ const Dashboard = () => {
           ))}
         </View>
       </View>
+      </View>
     </ScrollView>
   );
 };
@@ -132,6 +146,15 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 8,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -140,7 +163,6 @@ const styles = StyleSheet.create({
   subheader: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 16,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -204,6 +226,26 @@ const styles = StyleSheet.create({
   chart: {
     borderRadius: 16,
     marginVertical: 8,
+  },
+  productManagementButton: {
+    backgroundColor: '#084c3c',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+    alignSelf: 'flex-start',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  productManagementButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   targetCard: {
     backgroundColor: '#f8f9fa',
@@ -269,4 +311,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard; 
+export default Dashboard;
