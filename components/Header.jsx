@@ -6,8 +6,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Sidebar from "./Sidebar";
 import { useNavigation, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Header() {
+  const insets = useSafeAreaInsets();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const netInfo = useSelector((state) => state.netInfo);
@@ -23,7 +25,7 @@ export default function Header() {
   return (
     <View
       style={{
-        backgroundColor: "lightgreen",
+        backgroundColor: "#058743",
         position: "sticky",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -32,6 +34,7 @@ export default function Header() {
         top: 0,
         left: 0,
         paddingHorizontal: 10,
+        paddingTop: insets.top,
         zIndex: 10,
       }}
     >
