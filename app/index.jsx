@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* 
   COLOR SCHEMES
@@ -105,7 +106,6 @@ export default function Index() {
         <View style={{ backgroundColor: "blue", width: "100%", height: 400 }}>
           <Text style={{ color: "white" }}>This is the landing page.</Text>
         </View>
-
         <View
           style={{
             width: "100%",

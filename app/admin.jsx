@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
@@ -17,6 +17,11 @@ const Dashboard = () => {
     { title: 'Income', value: 'P1,163,100.00', change: '+20%' },
     { title: 'Expenses', value: 'P556,750.00', change: '+15%' },
     { title: 'Balance', value: 'P2,406,750.00', change: '+30%' },
+  ];
+
+  const currentOffers = [
+    { title: '40% Discount', endsIn: 'Ends in 2 days' },
+    { title: 'Summer Sale', endsIn: 'Ends in 5 days' }
   ];
 
   const chartData = {
@@ -85,8 +90,34 @@ const Dashboard = () => {
           bezier
           style={styles.chart}
         />
-
-
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.header}>Sales Target</Text>
+        <View style={styles.targetCard}>
+          <View style={styles.targetRow}>
+            <View style={styles.targetItem}>
+              <Text style={styles.targetLabel}>Daily Target</Text>
+              <Text style={styles.targetValue}>32,500</Text>
+            </View>
+            <View style={styles.targetItem}>
+              <Text style={styles.targetLabel}>Monthly Target</Text>
+              <Text style={styles.targetValue}>P725,000.00</Text>
+            </View>
+          </View>
+          
+          <Text style={styles.offersHeader}>Current Offers</Text>
+          {currentOffers.map((offer, index) => (
+            <View key={index} style={styles.offerCard}>
+              <View style={styles.offerTextContainer}>
+                <Text style={styles.offerTitle}>{offer.title}</Text>
+                <Text style={styles.offerEnds}>{offer.endsIn}</Text>
+              </View>
+              <TouchableOpacity style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>View</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -111,7 +142,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 16,
   },
-  // ADMIN CARDS
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -148,7 +178,6 @@ const styles = StyleSheet.create({
   negative: {
     color: '#dc3545',
   },
-  // SALES CARDS
   cardContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -176,19 +205,68 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginVertical: 8,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 8,
+  targetCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
   },
-  footerText: {
-    fontSize: 12,
+  targetRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  targetItem: {
+    width: '48%',
+  },
+  targetLabel: {
+    fontSize: 14,
     color: '#6c757d',
   },
-  footerHighlight: {
+  targetValue: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 4,
+    marginTop: 4,
+  },
+  offersHeader: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#333',
+  },
+  offerCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  offerTextContainer: {
+    flex: 1,
+  },
+  offerTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  offerEnds: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginTop: 4,
+  },
+  viewButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  viewButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 
-export default Dashboard;
+export default Dashboard; 

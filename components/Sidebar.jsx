@@ -9,10 +9,12 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
 export default function Sidebar({ onOpenChange, isOpen }) {
+  const insets = useSafeAreaInsets();
   const translateX = useRef(new Animated.Value(width)).current;
   const [modalVisible, setModalVisible] = useState(isOpen);
 
@@ -48,7 +50,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
       }}
     >
       <Pressable style={styles.overlay} onPress={() => onOpenChange(false)} />
-      <Animated.View style={[styles.sidebar, { transform: [{ translateX }] }]}>
+      <Animated.View style={[styles.sidebar, { transform: [{ translateX }], backgroundColor: "#058743", paddingTop: insets.top }]}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>
           Sidebar Navigations
         </Text>
@@ -60,7 +62,6 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Home</Text>
           </Pressable>
-
           <Pressable
             onPress={() => {
               handleNavigation("allproducts");
@@ -68,7 +69,6 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>All Products</Text>
           </Pressable>
-
           <Pressable
             onPress={() => {
               handleNavigation("cart");
@@ -76,7 +76,6 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Cart</Text>
           </Pressable>
-
           <Pressable
             onPress={() => {
               handleNavigation("admin");
@@ -84,7 +83,6 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Admin</Text>
           </Pressable>
-
           {/* Replace the params id with the current user ID */}
           <Link
             href={{ pathname: "/[id]", params: { id: "4" } }}
