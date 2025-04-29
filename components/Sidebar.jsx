@@ -83,12 +83,19 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Admin</Text>
           </Pressable>
+          <Pressable
+            onPress={() => {
+              handleNavigation("profilepage");
+            }}
+          >
+            <Text>profile</Text>
+          </Pressable>
           {/* Replace the params id with the current user ID */}
           <Link
             href={{ pathname: "/[id]", params: { id: "4" } }}
             onPress={() => onOpenChange(false)}
           >
-            <Text>Profile</Text>
+            <Text>id</Text>
           </Link>
         </View>
       </Animated.View>
