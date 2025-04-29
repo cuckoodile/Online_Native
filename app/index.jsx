@@ -1,22 +1,19 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState } from "react";
 import {
-  Image,
-  Pressable,
+  ActivityIndicator,
   RefreshControl,
   ScrollView,
   Text,
   View,
-  Dimensions,
-  TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
-import Ionicons from "@expo/vector-icons/Ionicons";
-// import Carousel from "react-native-reanimated-carousel";
+import { useTheme } from "react-native-paper";
+import axios from "axios";
+import { BASE_URL } from "../API/config";
 
 import MyCarousel from "../components/MyCarousel";
 import Card from "../components/Card";
-import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQuery } from "@tanstack/react-query";
 
 /* 
   COLOR SCHEMES
@@ -26,8 +23,39 @@ import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context
       secondary-bg: rgb(139, 168, 136)
 */
 
+// API Data Fetch Test
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
+const fetchProducts = async () => {
+  try {
+    const response = await api.get("/api/products");
+    console.log("API Response:", response.data);
+    return response.data; // Make sure this is an array
+  } catch (error) {
+    console.error("API Error:", error);
+    throw new Error("Failed to fetch products");
+  }
+};
+
 export default function Index() {
+  const theme = useTheme();
+
   const [refreshing, setRefreshing] = useState(false);
+
+  const {
+    data: products,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const carouselData = [
     {
@@ -55,103 +83,68 @@ export default function Index() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
+      refetch();
       setRefreshing(false);
     }, 500);
   }, []);
 
-  const sampleData = [
-    {
-      id: 1,
-      title: "Red round hat",
-      category: "Hat",
-      price: 750,
-    },
-    {
-      id: 2,
-      title: "Frieren jacket",
-      category: "Jacket",
-      price: 290,
-    },
-    {
-      id: 3,
-      title: "Nike pants",
-      category: "Pants",
-      price: 150,
-    },
-    {
-      id: 4,
-      title: "Red round hat",
-      category: "Hat",
-      price: 750,
-    },
-    {
-      id: 5,
-      title: "Frieren jacket",
-      category: "Jacket",
-      price: 290,
-    },
-    {
-      id: 6,
-      title: "Nike pants",
-      category: "Pants",
-      price: 150,
-    },
-    {
-      id: 7,
-      title: "Red round hat",
-      category: "Hat",
-      price: 750,
-    },
-    {
-      id: 8,
-      title: "Frieren jacket",
-      category: "Jacket",
-      price: 290,
-    },
-    {
-      id: 9,
-      title: "Nike pants",
-      category: "Pants",
-      price: 150,
-    },
-  ];
-
   const userProfile = [1, 4, 7];
+
+  if (isError) {
+    console.log("Error fetching products: ", error.message);
+  } else {
+    console.log("Products to render:", products); // Debug what you're getting
+  }
 
   return (
     <View
       style={{
-        backgroundColor: "rgb(68, 98, 74)",
-        justifyContent: "center",
-        alignItems: "center",
+        backgroundColor: theme.background.primary,
         flex: 1,
         paddingTop: 5,
       }}
     >
+      {isLoading && (
+        <View
+          style={{
+            backgroundColor: "rgba(0, 0, 0, .4)",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "100%",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 100,
+          }}
+        >
+          <ActivityIndicator size={60} />
+        </View>
+      )}
+
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
         }
         style={{ width: "100%" }}
       >
-        {/* Carousel */}
         <MyCarousel carouselData={carouselData} />
-
-        <View style={{ backgroundColor: "blue", width: "100%", height: 400 }}>
-          <Text style={{ color: "white" }}>This is the landing page.</Text>
-        </View>
         <View
           style={{
-            // width: "100%",
             paddingHorizontal: 10,
             paddingVertical: 30,
             gap: 10,
           }}
         >
           <Text style={{ color: "white" }}>New Arrivals</Text>
-          {sampleData.map((item) => (
-            <Card key={item.id} item={item} cart={userProfile} />
-          ))}
+
+          {Array.isArray(products) && products.length > 0 ? (
+            products.map((item) => (
+              <Card key={item.id} item={item} cart={userProfile} />
+            ))
+          ) : (
+            <Text style={{ color: "white" }}>No products available</Text>
+          )}
         </View>
       </ScrollView>
     </View>

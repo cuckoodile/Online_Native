@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { Link, router } from "expo-router";
+
+import { LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -35,8 +37,8 @@ const Dashboard = () => {
     ],
   };
 
-  const handleProductManagementPress = () => {
-    console.log('Product Management button pressed');
+  const handleNavigation = (path) => {
+    router.replace(`${path}`);
   };
 
   return (
@@ -49,7 +51,9 @@ const Dashboard = () => {
           </View>
           <TouchableOpacity 
             style={styles.productManagementButton}
-            onPress={handleProductManagementPress}
+            onPress={() => {
+              handleNavigation("productmanagement");
+            }}
           >
             <Text style={styles.productManagementButtonText}>Product Management</Text>
           </TouchableOpacity>

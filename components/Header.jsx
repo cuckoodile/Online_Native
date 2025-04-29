@@ -1,18 +1,20 @@
 import { View, Text, Pressable } from "react-native";
 import React, { useState } from "react";
+import { router } from "expo-router";
 
 import { useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Switch, useTheme } from "react-native-paper";
 
 import Sidebar from "./Sidebar";
-import { useNavigation, router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function Header() {
+const Header = ({ isDarkMode, setDarkMode }) => {
   const insets = useSafeAreaInsets();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-
+  const theme = useTheme();
   const netInfo = useSelector((state) => state.netInfo);
+
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const handleNavigation = (path, params) => {
     if (params?.id) {
@@ -25,7 +27,7 @@ export default function Header() {
   return (
     <View
       style={{
-        backgroundColor: "#084c3c",
+        backgroundColor: theme.background.tertiary,
         position: "sticky",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -39,11 +41,21 @@ export default function Header() {
       }}
     >
       <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("")}>
-        <Text>DevSix</Text>
+        <Text>DevSixs</Text>
       </Pressable>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-        <Ionicons name={netInfo.isConnected ? "wifi-outline" : "cloud-offline-outline"} size={27} color="black" />
+        <Switch
+          value={isDarkMode}
+          onValueChange={() => setDarkMode(!isDarkMode)}
+          theme={theme}
+        />
+
+        <Ionicons
+          name={netInfo.isConnected ? "wifi-outline" : "cloud-offline-outline"}
+          size={27}
+          color="black"
+        />
 
         <Pressable
           style={{ padding: 5 }}
@@ -73,4 +85,6 @@ export default function Header() {
       <Sidebar isOpen={isSidebarOpen} onOpenChange={setSidebarOpen} />
     </View>
   );
-}
+};
+
+export default Header;

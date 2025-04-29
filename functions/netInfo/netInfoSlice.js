@@ -21,13 +21,10 @@ const netInfoSlice = createSlice({
   },
 });
 
-// Export the action creator
 export const { updateConnectionStatus } = netInfoSlice.actions;
 
-// Export the reducer
 export default netInfoSlice.reducer;
 
-// Thunk function to check connection status
 export const checkConnection = () => async (dispatch) => {
   const state = await NetInfo.fetch();
   dispatch(updateConnectionStatus(state));

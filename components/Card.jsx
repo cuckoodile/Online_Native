@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Card({ item = [], cart = [] }) {
-  const [onCart, setCart] = useState(cart.includes(item.id) ? true : false);
+  const [onCart, setCart] = useState(cart?.includes(item?.id) ? true : false);
   const navigation = useNavigation();
 
   const cartSize = 23;
@@ -36,7 +36,7 @@ export default function Card({ item = [], cart = [] }) {
     >
       <Pressable
         android_ripple={{ color: "black" }}
-        onPress={() => handleProductNavigation(item.id)} // Pass item.id here
+        onPress={() => handleProductNavigation(item.id)}
       >
         {/* Image */}
         <View

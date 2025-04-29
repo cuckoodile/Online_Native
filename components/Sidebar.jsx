@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, router } from "expo-router";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
 
 export default function Sidebar({ onOpenChange, isOpen }) {
+  const { width } = Dimensions.get("window");
   const insets = useSafeAreaInsets();
   const translateX = useRef(new Animated.Value(width)).current;
   const [modalVisible, setModalVisible] = useState(isOpen);

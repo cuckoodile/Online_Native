@@ -7,12 +7,10 @@ const NetInfoProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Initial check
     NetInfo.fetch().then(state => {
       dispatch(updateConnectionStatus(state));
     });
 
-    // Subscribe to network state updates
     const unsubscribe = NetInfo.addEventListener(state => {
       dispatch(updateConnectionStatus(state));
     });
