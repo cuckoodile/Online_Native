@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import netInfoReducer from '../netInfo/netInfoSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import netInfoReducer from "../netInfo/netInfoSlice";
 
 export const networkInformation = configureStore({
   reducer: {

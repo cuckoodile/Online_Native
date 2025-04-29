@@ -1,10 +1,7 @@
 import { useCallback, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
+
+import { useTheme } from "react-native-paper";
 
 import MyCarousel from "../components/MyCarousel";
 import Card from "../components/Card";
@@ -18,6 +15,8 @@ import Card from "../components/Card";
 */
 
 export default function Index() {
+  const theme = useTheme();
+  
   const [refreshing, setRefreshing] = useState(false);
 
   const carouselData = [
@@ -112,7 +111,7 @@ export default function Index() {
   return (
     <View
       style={{
-        backgroundColor: "rgb(68, 98, 74)",
+        backgroundColor: theme.background.primary ,
         justifyContent: "center",
         alignItems: "center",
         flex: 1,
@@ -127,13 +126,8 @@ export default function Index() {
       >
         {/* Carousel */}
         <MyCarousel carouselData={carouselData} />
-
-        <View style={{ backgroundColor: "blue", width: "100%", height: 400 }}>
-          <Text style={{ color: "white" }}>This is the landing page.</Text>
-        </View>
         <View
           style={{
-            // width: "100%",
             paddingHorizontal: 10,
             paddingVertical: 30,
             gap: 10,
