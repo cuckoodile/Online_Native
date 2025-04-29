@@ -17,7 +17,11 @@
     },
 
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "image": "./assets/images/devsix.jpg",  
+      "backgroundColor": "#084c3c",      
+      "resizeMode": "contain",
+      "imageWidth": 200
     },
     "android": {
       "adaptiveIcon": {
