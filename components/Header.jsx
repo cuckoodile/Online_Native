@@ -1,12 +1,12 @@
 import { View, Text, Pressable } from "react-native";
 import React, { useState } from "react";
+import { router } from "expo-router";
 
 import { useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Sidebar from "./Sidebar";
-import { useNavigation, router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Header() {
   const insets = useSafeAreaInsets();
@@ -39,7 +39,7 @@ export default function Header() {
       }}
     >
       <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("")}>
-        <Text>DevSix</Text>
+        <Text>DevSixs</Text>
       </Pressable>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>

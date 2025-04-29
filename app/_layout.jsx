@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
-import { networkInformation } from "../netInfo/networkInformation";
-import NetInfoProvider from "../netInfo/netInfoProvider"
+
+import { networkInformation } from "../functions/redux/globalStore";
+import NetInfoProvider from "../functions/netInfo/netInfoProvider"
 
 import Header from "../components/Header";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   return (

@@ -1,6 +1,7 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRef, useState } from "react";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
+
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 

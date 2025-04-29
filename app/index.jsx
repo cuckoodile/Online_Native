@@ -1,22 +1,13 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState } from "react";
 import {
-  Image,
-  Pressable,
   RefreshControl,
   ScrollView,
   Text,
   View,
-  Dimensions,
-  TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
-import Ionicons from "@expo/vector-icons/Ionicons";
-// import Carousel from "react-native-reanimated-carousel";
 
 import MyCarousel from "../components/MyCarousel";
 import Card from "../components/Card";
-import { SafeAreaView , useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* 
   COLOR SCHEMES
