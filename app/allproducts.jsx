@@ -82,7 +82,6 @@ const CollectionScreen = () => {
         </Text>
       </View>
 
-      {/* Filter row */}
       <View style={styles.filterRow}>
         <TouchableOpacity style={styles.filterItem}>
           <MaterialIcons name="check-box-outline-blank" size={20} color="#333" />
@@ -90,12 +89,10 @@ const CollectionScreen = () => {
         </TouchableOpacity>
         
         <View style={styles.filterItem}>
-          <MaterialIcons name="check-box" size={20} color="#333" />
           <Text style={styles.filterText}>Showing {products.length} products</Text>
         </View>
       </View>
 
-      {/* Product grid using your Card component */}
       <FlatList
         data={products}
         keyExtractor={(item) => item.id}
@@ -152,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   card: {
-    width: '48%', // Allows for 2-column layout with spacing
+    width: '48%', 
   },
 });
 
