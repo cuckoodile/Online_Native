@@ -41,7 +41,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
       }}
     >
       <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("")}>
-        <Text>DevSixs</Text>
+        <Text>DevSix</Text>
       </Pressable>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>

@@ -531,6 +531,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     marginTop: 4,      
+    overflow:"visible",
   },
   dropdownOption: {
     padding: 12,
