@@ -89,8 +89,16 @@ export default function Sidebar({ onOpenChange, isOpen }) {
               handleNavigation("profilepage");
             }}
           >
-            <Text>profile</Text>
+            <Text>Profile</Text>
           </Pressable>
+          <Pressable
+            onPress={() => {
+              handleNavigation("login");
+            }}
+          >
+            <Text>Log In</Text>
+          </Pressable>
+          
           {/* Replace the params id with the current user ID */}
           <Link
             href={{ pathname: "/[id]", params: { id: "4" } }}
