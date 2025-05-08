@@ -8,14 +8,17 @@ import { PaperProvider } from "react-native-paper";
 import { lightTheme, darkTheme } from "../functions/theme/themes";
 import NetInfoProvider from "../functions/netInfo/netInfoProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { LogBox } from "react-native";
 
 import Header from "../components/Header";
 import { useState } from "react";
 
+LogBox.ignoreLogs(["findDOMNode is deprecated"]);
 
 export default function RootLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const queryClient = new QueryClient();
+
 
   return (
     <Provider store={networkInformation}>

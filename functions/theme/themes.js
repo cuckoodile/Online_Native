@@ -22,8 +22,12 @@ export const lightTheme = {
     statusBar: "#F3EDF7",
   },
   text: {
-    margin: 16,
-    padding: 8,
+    title: {
+      color: "rgba(0,79,59,1)",
+      fontWeight: "bold",
+      fontSize: 20,
+      marginVertical: 15,
+    },
   },
 };
 

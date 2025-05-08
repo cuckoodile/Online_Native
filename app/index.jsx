@@ -90,6 +90,24 @@ export default function Index() {
 
   const userProfile = [1, 4, 7];
 
+  if (isLoading) {
+    <View
+      style={{
+        backgroundColor: "rgba(0, 0, 0, .4)",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        height: "100%",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 100,
+      }}
+    >
+      <ActivityIndicator size={60} />
+    </View>;
+  }
+
   if (isError) {
     console.log("Error fetching products: ", error.message);
   } else if (!isLoading && !isError) {
@@ -105,24 +123,6 @@ export default function Index() {
           paddingTop: 5,
         }}
       >
-        {isLoading && (
-          <View
-            style={{
-              backgroundColor: "rgba(0, 0, 0, .4)",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              height: "100%",
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 100,
-            }}
-          >
-            <ActivityIndicator size={60} />
-          </View>
-        )}
-
         <ScrollView
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
@@ -137,9 +137,10 @@ export default function Index() {
               gap: 10,
             }}
           >
-            <Text style={{ color: "black" }}>New Arrivals</Text>
+            <Text style={theme.text.title}>New Arrivals</Text>
+
             {products.map((item) => (
-                <Card key={item.id} item={item} cart={userProfile} />
+              <Card key={item.id} item={item} cart={userProfile} />
             ))}
           </View>
         </ScrollView>
