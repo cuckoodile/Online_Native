@@ -19,7 +19,6 @@ export default function RootLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const queryClient = new QueryClient();
 
-
   return (
     <Provider store={networkInformation}>
       <QueryClientProvider client={queryClient}>
@@ -35,7 +34,8 @@ export default function RootLayout() {
                     />
                   ),
                 }}
-              />
+              >
+              </Stack>
             </SafeAreaProvider>
           </NetInfoProvider>
         </PaperProvider>

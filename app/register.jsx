@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+} from "react-native";
+import { router } from "expo-router";
 
 const RegisterScreen = () => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [data, setData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const handleRegister = () => {
-    console.log('Registering with:', { fullName, email, password });
+    console.log("Registering with:", { data });
   };
 
-    const handleNavigation = (path) => {
-      router.replace(`${path}`);
-    };
+  const handleNavigation = (path) => {
+    router.replace(`${path}`);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create new account</Text>
@@ -22,15 +31,15 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
-        value={fullName}
-        onChangeText={setFullName}
+        value={data.fullName}
+        onChangeText={(text) => setData({ ...data, fullName: text })}
       />
 
       <TextInput
         style={styles.input}
         placeholder="Email address"
-        value={email}
-        onChangeText={setEmail}
+        value={data.email}
+        onChangeText={(text) => setData({ ...data, email: text })}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -38,29 +47,30 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
+        value={data.password}
+        onChangeText={(text) => setData({ ...data, password: text })}
         secureTextEntry
       />
 
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        value={data.confirmPassword}
+        onChangeText={(text) => setData({ ...data, confirmPassword: text })}
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+      <Pressable style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>Already have an account? </Text>
-        <Pressable           
-        onPress={() => {
+        <Pressable
+          onPress={() => {
             handleNavigation("login");
-          }}>
+          }}
+        >
           <Text style={styles.loginLink}>Login</Text>
         </Pressable>
       </View>
@@ -76,18 +86,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     height: 50,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
@@ -95,36 +105,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   registerButton: {
-    backgroundColor: '#084c3c',
+    backgroundColor: "#084c3c",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
     marginBottom: 20,
   },
   registerButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 30,
   },
   loginText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   loginLink: {
     fontSize: 14,
-    color: '#084c3c',
-    fontWeight: 'bold',
+    color: "#084c3c",
+    fontWeight: "bold",
   },
   termsText: {
     fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
+    color: "#999",
+    textAlign: "center",
     marginTop: 20,
   },
 });

@@ -3,18 +3,21 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
+
   const handleLogin = () => {
-    console.log("Logging in with:", email, password);
+    console.log("Logging in with:", data);
   };
 
   const handleNavigation = (path) => {
@@ -26,31 +29,34 @@ const LoginScreen = () => {
       <Text style={styles.title}>Sign in to your account</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
+        placeholder="Email address"
+        value={data.email}
+        onChangeText={(text) => setData({ ...data, email: text })}
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
+        value={data.password}
+        onChangeText={(text) => setData({ ...data, password: text })}
         secureTextEntry
       />
 
       <View style={styles.rememberMeContainer}>
-        <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
+        <Pressable onPress={() => setRememberMe(!rememberMe)}>
           <View style={[styles.checkbox, rememberMe && styles.checked]}>
             {rememberMe && <Text style={styles.checkmark}>✓</Text>}
           </View>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.rememberMeText}>Remember me</Text>
       </View>
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+
+      <Pressable style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
+      </Pressable>
+
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don't have an account yet? </Text>
         <Pressable
@@ -61,10 +67,12 @@ const LoginScreen = () => {
           <Text style={styles.signUpLink}>Sign up</Text>
         </Pressable>
       </View>
+
       <View style={styles.testCredentials}>
         <Text style={styles.testText}>Admin: admin@example.com / admin123</Text>
         <Text style={styles.testText}>User: user@example.com / user123</Text>
       </View>
+
       <Text style={styles.termsText}>
         By continuing, you agree to our Terms of Service and Privacy Policy
       </Text>

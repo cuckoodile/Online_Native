@@ -18,7 +18,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
 
   const handleNavigation = (path, params) => {
     if (params?.id) {
-      router.replace(`/${params.id}`);
+      router.replace(`/dynamic-pages/user-profile/${params.id}`);
     } else {
       router.replace(`/${path}`);
     }

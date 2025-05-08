@@ -12,7 +12,7 @@ const fontConfig = {
 // Light Theme
 export const lightTheme = {
   background: {
-    primary: "rgba(236,253,245,1)",
+    primary: "rgb(236,253,245)",
     secondary: "rgb(255,255,255)",
     tertiary: "rgba(0,79,59,1)",
     header: "#FFFFFF",

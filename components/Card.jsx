@@ -3,8 +3,9 @@ import { Image, Pressable, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 
-export default function Card({ item, cart}) {
+export default function Card({ item, cart }) {
   const [onCart, setCart] = useState(cart?.includes(item?.id) ? true : false);
   const navigation = useNavigation();
 
@@ -14,11 +15,9 @@ export default function Card({ item, cart}) {
     setCart(!onCart);
   }
 
-  function handleProductNavigation(id) {
-    console.log("Navigating to id: ", id);
-
-    navigation.navigate(`[id]`, { id });
-  }
+  const handleProductNavigation = (id) => {
+    router.replace(`/dynamic-pages/product/${id}`);
+  };
 
   return (
     <View

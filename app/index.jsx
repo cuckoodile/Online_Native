@@ -136,7 +136,7 @@ export default function Index() {
             gap: 10,
           }}
         >
-          <Text style={theme.text.title}>New Arrivals {isLoading}</Text>
+          <Text style={theme.text.title}>New Arrivals</Text>
 
           {!isLoading &&
             products.map((item) => (

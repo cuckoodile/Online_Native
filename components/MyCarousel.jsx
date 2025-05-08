@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Pressable, View } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSharedValue } from "react-native-reanimated";
@@ -86,7 +86,7 @@ function MyCarousel({ carouselData }) {
           transform: "translateY(-30%)",
         }}
       >
-        <TouchableOpacity
+        <Pressable
           onPress={() => onButtonPress("back")}
           style={{
             backgroundColor: "rgba(0, 0, 0, .4)",
@@ -97,9 +97,9 @@ function MyCarousel({ carouselData }) {
           }}
         >
           <Ionicons name="chevron-back" size={30} color="white" />
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           onPress={() => onButtonPress("next")}
           style={{
             backgroundColor: "rgba(0, 0, 0, .4)",
@@ -110,7 +110,7 @@ function MyCarousel({ carouselData }) {
           }}
         >
           <Ionicons name="chevron-forward" size={30} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

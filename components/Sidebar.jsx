@@ -63,6 +63,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Home</Text>
           </Pressable>
+          
           <Pressable
             onPress={() => {
               handleNavigation("allproducts");
@@ -70,6 +71,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>All Products</Text>
           </Pressable>
+
           <Pressable
             onPress={() => {
               handleNavigation("cart");
@@ -77,6 +79,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Cart</Text>
           </Pressable>
+
           <Pressable
             onPress={() => {
               handleNavigation("admin");
@@ -84,13 +87,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Admin</Text>
           </Pressable>
-          <Pressable
-            onPress={() => {
-              handleNavigation("profilepage");
-            }}
-          >
-            <Text>Profile</Text>
-          </Pressable>
+
           <Pressable
             onPress={() => {
               handleNavigation("login");
@@ -99,12 +96,11 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             <Text>Log In</Text>
           </Pressable>
           
-          {/* Replace the params id with the current user ID */}
           <Link
-            href={{ pathname: "/[id]", params: { id: "4" } }}
+            href={{ pathname: "/dynamic-pages/user-profile/[id]", params: { id: "4" } }}
             onPress={() => onOpenChange(false)}
           >
-            <Text>id</Text>
+            <Text>Profile</Text>
           </Link>
         </View>
       </Animated.View>
