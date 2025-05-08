@@ -46,7 +46,7 @@ export default function Index() {
 
   const {
     data: products,
-    isLoading = true,
+    isLoading,
     isError,
     error,
     refetch,
@@ -114,37 +114,36 @@ export default function Index() {
     console.log("Products to render:", products);
   }
 
-  if (!isLoading) {
-    return (
-      <View
-        style={{
-          backgroundColor: theme.background.primary,
-          flex: 1,
-          paddingTop: 5,
-        }}
+  return (
+    <View
+      style={{
+        backgroundColor: theme.background.primary,
+        flex: 1,
+        paddingTop: 5,
+      }}
+    >
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+        }
+        style={{ width: "100%" }}
       >
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
-          }
-          style={{ width: "100%" }}
+        <MyCarousel carouselData={carouselData} />
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 30,
+            gap: 10,
+          }}
         >
-          <MyCarousel carouselData={carouselData} />
-          <View
-            style={{
-              paddingHorizontal: 10,
-              paddingVertical: 30,
-              gap: 10,
-            }}
-          >
-            <Text style={theme.text.title}>New Arrivals</Text>
+          <Text style={theme.text.title}>New Arrivals {isLoading}</Text>
 
-            {products.map((item) => (
+          {!isLoading &&
+            products.map((item) => (
               <Card key={item.id} item={item} cart={userProfile} />
-            ))}
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
+            )) || <Text>Loading....</Text>}
+        </View>
+      </ScrollView>
+    </View>
+  );
 }
