@@ -1,15 +1,10 @@
 import { useState } from "react";
-import {
-  Image,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function Card({ item = [], cart = [] }) {
+export default function Card({ item, cart}) {
   const [onCart, setCart] = useState(cart?.includes(item?.id) ? true : false);
   const navigation = useNavigation();
 
@@ -66,10 +61,10 @@ export default function Card({ item = [], cart = [] }) {
           }}
         >
           <Text style={{ color: "green" }}>
-            {item?.category ?? "No category!"}
+            {item?.category.name ?? "No category!"}
           </Text>
 
-          <Text>{item?.title ?? "No title!"}</Text>
+          <Text>{item?.name ?? "No title!"}</Text>
 
           {/* Price and Cart */}
           <View

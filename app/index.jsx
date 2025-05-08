@@ -31,8 +31,8 @@ const api = axios.create({
 const fetchProducts = async () => {
   try {
     const response = await api.get("/api/products");
-    console.log("API Response:", response.data);
-    return response.data; // Make sure this is an array
+    // console.log("API Response:", response.data);
+    return response.data.data;
   } catch (error) {
     console.error("API Error:", error);
     throw new Error("Failed to fetch products");
@@ -46,7 +46,7 @@ export default function Index() {
 
   const {
     data: products,
-    isLoading,
+    isLoading = true,
     isError,
     error,
     refetch,
@@ -92,63 +92,58 @@ export default function Index() {
 
   if (isError) {
     console.log("Error fetching products: ", error.message);
-  } else {
-    console.log("Products to render:", products); // Debug what you're getting
+  } else if (!isLoading && !isError) {
+    console.log("Products to render:", products);
   }
 
-  return (
-    <View
-      style={{
-        backgroundColor: theme.background.primary,
-        flex: 1,
-        paddingTop: 5,
-      }}
-    >
-      {isLoading && (
-        <View
-          style={{
-            backgroundColor: "rgba(0, 0, 0, .4)",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            height: "100%",
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 100,
-          }}
-        >
-          <ActivityIndicator size={60} />
-        </View>
-      )}
-
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
-        }
-        style={{ width: "100%" }}
+  if (!isLoading) {
+    return (
+      <View
+        style={{
+          backgroundColor: theme.background.primary,
+          flex: 1,
+          paddingTop: 5,
+        }}
       >
-        <MyCarousel carouselData={carouselData} />
-        <View
-          style={{
-            paddingHorizontal: 10,
-            paddingVertical: 30,
-            gap: 10,
-          }}
+        {isLoading && (
+          <View
+            style={{
+              backgroundColor: "rgba(0, 0, 0, .4)",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              height: "100%",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 100,
+            }}
+          >
+            <ActivityIndicator size={60} />
+          </View>
+        )}
+
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+          }
+          style={{ width: "100%" }}
         >
-          <Text style={{ color: "white" }}>New Arrivals</Text>
-
-          {Array.isArray(products) && products.length > 0 ? (
-            products.map((item) => (
-              <Card key={item.id} item={item} cart={userProfile} />
-            ))
-          ) : (
-            <Text style={{ color: "white" }}>No products available</Text>
-          )}
-        </View>
-      </ScrollView>
-    </View>
-  );
+          <MyCarousel carouselData={carouselData} />
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 30,
+              gap: 10,
+            }}
+          >
+            <Text style={{ color: "black" }}>New Arrivals</Text>
+            {products.map((item) => (
+                <Card key={item.id} item={item} cart={userProfile} />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
 }
-
-<Card />;
