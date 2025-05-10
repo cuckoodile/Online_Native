@@ -8,6 +8,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "backgroundColor": "#084c3c",      
 
    "splash": {
       "image": "./assets/images/devsix.jpg",  
