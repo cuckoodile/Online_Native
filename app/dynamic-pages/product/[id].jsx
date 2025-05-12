@@ -60,21 +60,21 @@ export default function Product() {
     }, 500);
   }, []);
 
-  
-const productImages = product?.product_image
-? (() => {
-    try {
-      return JSON.parse(product.product_image);
-    } catch (error) {
-      console.error("Error parsing product.product_image:", error);
-      return [];
-    }
-  })()
-: [];
+  const productImages = product?.product_image
+    ? (() => {
+        try {
+          const parsed = JSON.parse(product.product_image);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        } catch (error) {
+          console.error("Error parsing product.product_image:", error);
+          return [];
+        }
+      })()
+    : [];
 
-const imageHandler = () => {
-return productImages[selectedImage] || "";
-};
+  const imageHandler = () => {
+    return productImages[selectedImage] || "";
+  };
 
   console.log("Product selected:", product);
 
@@ -104,78 +104,64 @@ return productImages[selectedImage] || "";
 
   if (!isLoading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: theme.background.primary,
-        }}
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+        }
       >
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
-          }
-        >
-
-          <View className="space-y-4">
-            <View
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="aspect-square rounded-lg overflow-hidden"
-            >
-              <Image
-                src={imageHandler()}
-                // alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </View>
-            <View style={styles.container}>
-              {productImages.map((image, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => setSelectedImage(index)}
-                  style={styles.button}
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </Pressable>
-              ))}
-            </View>
-
+        <View style={{ margin: 10 }}>
+          <View
+            style={{ aspectRatio: 1, borderRadius: 10, overflow: "hidden" }}
+          >
+            <Image source={{ uri: imageHandler() }} style={styles.image} />
           </View>
+          <View style={styles.container}>
+            {productImages.map((image, index) => (
+              <Pressable
+                key={index}
+                onPress={() => setSelectedImage(index)}
+                style={styles.button}
+              >
+                <View>
+                  <Image source={{ uri: image }} style={styles.image} />
+                  <Text>No Image Available</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </View>
 
-            <View>
-              <Text style={styles.text}>
-                Where is the image?
-              </Text>
-            </View>
-
-        </ScrollView>
-      </View>
+        <View>
+          <Text style={styles.text}>Description Section</Text>
+        </View>
+      </ScrollView>
     );
   } else {
-    return <Text>Loading.....</Text>
+    return <Text>Loading.....</Text>;
   }
 }
 
 const styles = StyleSheet.create({
-  imagecontainer:{
-    marginTop: '1rem',
+  imagecontainer: {
+    marginTop: "1rem", 
   },
   container: {
-    grid: "column",
-    gap: "4",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
   button: {
-    aspectRatio: "1 / 1",
-    borderRadius: "2",
-    border: "2",
-    overflow: "hidden",
+    margin: 5,
+    width: 100,
+    height: 100,
   },
-  text:{
-    color: 'red'
-  }
-  
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  text: {
+    textAlign: "center",
+    marginTop: 10,
+  },
 });
