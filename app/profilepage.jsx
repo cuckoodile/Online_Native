@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,11 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import UserAuth from "../components/higher-order-components/UserAuth";
 
 const ProfilePage = () => {
+  const auth = useSelector((state) => state.auth.user) ?? null;
+
   const [isEditing, setIsEditing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
@@ -30,6 +33,14 @@ const ProfilePage = () => {
   });
 
   const genderOptions = ["Male", "Female", "Others"];
+
+  useEffect(() => {
+    console.log("Profile id: ", auth);
+
+    if (!auth) {
+      router.replace("login");
+    }
+  }, [auth]);
 
   const handleEditPress = () => {
     setIsEditing(!isEditing);
@@ -522,22 +533,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
   },
   dropdown: {
-    position: 'absolute',
-    top: '100%',       
+    position: "absolute",
+    top: "100%",
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
-    marginTop: 4,      
-    overflow:"visible",
+    marginTop: 4,
+    overflow: "visible",
   },
   dropdownOption: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
 });
 
-export default ProfilePage;
+export default UserAuth(ProfilePage);

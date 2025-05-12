@@ -11,9 +11,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, router } from "expo-router";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/functions/authentication/authSlice";
 
 export default function Sidebar({ onOpenChange, isOpen }) {
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.user) ?? null;
+
   const { width } = Dimensions.get("window");
   const insets = useSafeAreaInsets();
   const translateX = useRef(new Animated.Value(width)).current;
@@ -41,6 +45,11 @@ export default function Sidebar({ onOpenChange, isOpen }) {
     onOpenChange(false);
   };
 
+  const handleLogOut = () => {
+    dispatch(logout);
+    handleNavigation("login");
+  };
+
   return (
     <Modal
       animationType="none"
@@ -51,7 +60,16 @@ export default function Sidebar({ onOpenChange, isOpen }) {
       }}
     >
       <Pressable style={styles.overlay} onPress={() => onOpenChange(false)} />
-      <Animated.View style={[styles.sidebar, { transform: [{ translateX }], backgroundColor: "#084c3c", paddingTop: insets.top }]}>
+      <Animated.View
+        style={[
+          styles.sidebar,
+          {
+            transform: [{ translateX }],
+            backgroundColor: "#084c3c",
+            paddingTop: insets.top,
+          },
+        ]}
+      >
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>
           Sidebar Navigations
         </Text>
@@ -63,7 +81,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           >
             <Text>Home</Text>
           </Pressable>
-          
+
           <Pressable
             onPress={() => {
               handleNavigation("allproducts");
@@ -80,28 +98,39 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             <Text>Cart</Text>
           </Pressable>
 
-          <Pressable
-            onPress={() => {
-              handleNavigation("admin");
-            }}
-          >
-            <Text>Admin</Text>
-          </Pressable>
+          {auth ? (
+            <Pressable
+              onPress={() => {
+                handleNavigation("admin");
+              }}
+            >
+              <Text>Admin</Text>
+            </Pressable>
+          ) : null}
 
-          <Pressable
-            onPress={() => {
-              handleNavigation("login");
-            }}
-          >
-            <Text>Log In</Text>
-          </Pressable>
-          
           <Link
-            href={{ pathname: "/dynamic-pages/user-profile/[id]", params: { id: "4" } }}
+            href={{
+              pathname: "/dynamic-pages/user-profile/[id]",
+              params: { id: "4" },
+            }}
             onPress={() => onOpenChange(false)}
           >
             <Text>Profile</Text>
           </Link>
+
+          {auth ? (
+            <Pressable onPress={handleLogOut}>
+              <Text>Log Out</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => {
+                handleNavigation("login");
+              }}
+            >
+              <Text>Log In</Text>
+            </Pressable>
+          )}
         </View>
       </Animated.View>
     </Modal>

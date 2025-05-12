@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 
-import { networkInformation } from "../functions/redux/globalStore";
+import { store } from "../functions/redux/globalStore";
 import { PaperProvider } from "react-native-paper";
 import { lightTheme, darkTheme } from "../functions/theme/themes";
 import NetInfoProvider from "../functions/netInfo/netInfoProvider";
@@ -20,7 +20,7 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
 
   return (
-    <Provider store={networkInformation}>
+    <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <PaperProvider theme={isDarkMode ? darkTheme : lightTheme}>
           <NetInfoProvider>

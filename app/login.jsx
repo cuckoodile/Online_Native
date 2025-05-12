@@ -1,23 +1,35 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
+import { useLogin } from "../functions/API/hooks/useAuth";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { login } from "../functions/authentication/authSlice";
+import GuestAuth from "../components/higher-order-components/GuestAuth";
 
 const LoginScreen = () => {
+  const dispatch = useDispatch();
+  const loginMutation = useLogin();
+  const auth = useSelector((selector) => selector.auth);
+
   const [rememberMe, setRememberMe] = useState(false);
 
   const [data, setData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
   const handleLogin = () => {
-    console.log("Logging in with:", data);
+    loginMutation.mutate(data, {
+      onSuccess: (userData) => {
+        dispatch(login(userData.data));
+        handleNavigation("/");
+      },
+      onError: (error) => {
+        console.error("Login failed:", error.message);
+        Alert.alert("Login Error", "Invalid email or password.");
+      },
+    });
   };
 
   const handleNavigation = (path) => {
@@ -29,10 +41,10 @@ const LoginScreen = () => {
       <Text style={styles.title}>Sign in to your account</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email address"
-        value={data.email}
-        onChangeText={(text) => setData({ ...data, email: text })}
-        keyboardType="email-address"
+        placeholder="Username"
+        value={data.username}
+        onChangeText={(text) => setData({ ...data, username: text })}
+        keyboardType="text"
         autoCapitalize="none"
       />
 
@@ -174,4 +186,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default GuestAuth(LoginScreen);

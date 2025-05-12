@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useTheme } from "react-native-paper";
 
-import { BASE_URL } from "../../../API/config";
+import { BASE_URL } from "../../../functions/API/config";
 import { useQuery } from "@tanstack/react-query";
 const api = axios.create({
   baseURL: BASE_URL,

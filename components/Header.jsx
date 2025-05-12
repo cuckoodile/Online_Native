@@ -13,6 +13,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const netInfo = useSelector((state) => state.netInfo);
+  const auth = useSelector((state) => state.auth.user) ?? null;
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -60,7 +61,9 @@ const Header = ({ isDarkMode, setDarkMode }) => {
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
-          onPress={() => handleNavigation("cart")}
+          onPress={() =>
+            auth ? handleNavigation("cart") : handleNavigation("login")
+          }
         >
           <Ionicons name="cart-outline" size={27} color="black" />
         </Pressable>
@@ -68,7 +71,11 @@ const Header = ({ isDarkMode, setDarkMode }) => {
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
-          onPress={() => handleNavigation("[id]", { id: "3" })} // Replace this with the current user ID
+          onPress={() =>
+            auth
+              ? handleNavigation("[id]", { id: auth?.id })
+              : handleNavigation("login")
+          }
         >
           <Ionicons name="person-circle-outline" size={27} color="black" />
         </Pressable>

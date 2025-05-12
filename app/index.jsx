@@ -9,7 +9,7 @@ import {
 
 import { useTheme } from "react-native-paper";
 import axios from "axios";
-import { BASE_URL } from "../API/config";
+import { BASE_URL } from "../functions/API/config";
 
 import MyCarousel from "../components/MyCarousel";
 import Card from "../components/Card";
