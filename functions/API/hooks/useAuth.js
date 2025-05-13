@@ -18,7 +18,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => postLogin(data),
+    mutationFn: (data) => postLoginAPI(data),
     onSuccess: (res) => {
       console.log("Invalidate query: ", res.data.id);
       queryClient.invalidateQueries(["user", res.data.id]);
@@ -26,7 +26,7 @@ export const useLogin = () => {
   });
 };
 
-const postLogin = async (data) => {
+const postLoginAPI = async (data) => {
   console.log("Logging in with:", data);
 
   try {
@@ -48,7 +48,7 @@ export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (token) => postLogout(token),
+    mutationFn: (token) => postLogoutAPI(token),
     onSuccess: (res) => {
       console.log("Invalidate query: ", res.data.id);
       queryClient.invalidateQueries(["user", res.data.id]);
@@ -56,7 +56,7 @@ export const useLogout = () => {
   });
 };
 
-const postLogout = async (token) => {
+const postLogoutAPI = async (token) => {
   console.log("Logout token", token);
 
   try {

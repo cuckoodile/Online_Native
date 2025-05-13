@@ -14,16 +14,9 @@ import { BASE_URL } from "../functions/API/config";
 import MyCarousel from "../components/MyCarousel";
 import Card from "../components/Card";
 import { useQuery } from "@tanstack/react-query";
+import { useGetCart } from "../functions/API/hooks/useCart";
+import { useSelector } from "react-redux";
 
-/* 
-  COLOR SCHEMES
-    LIGHT
-      bg: rgb(68, 98, 74)
-      primary-bg: rgb(192, 207, 178)
-      secondary-bg: rgb(139, 168, 136)
-*/
-
-// API Data Fetch Test
 const api = axios.create({
   baseURL: BASE_URL,
 });
@@ -41,21 +34,32 @@ const fetchProducts = async () => {
 
 export default function Index() {
   const theme = useTheme();
+  const useCarts = useGetCart();
+  const user = useSelector((state) => state.auth.user) ?? null;
 
   const [refreshing, setRefreshing] = useState(false);
 
   const {
     data: products,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isRefetching,
+    isLoading: productsLoading,
+    isError: productsIsError,
+    error: productsError,
+    refetch: productsRefetch,
+    isRefetching: productsIsRefetching,
   } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
     staleTime: 1000 * 60 * 5,
   });
+
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    isError: cartIsError,
+    error: cartError,
+    refetch: cartRefetch,
+    isRefetching: cartIsRefetching,
+  } = useGetCart(user);
 
   const carouselData = [
     {
@@ -90,7 +94,7 @@ export default function Index() {
 
   const userProfile = [1, 4, 7];
 
-  if (isLoading) {
+  if (productsLoading) {
     <View
       style={{
         backgroundColor: "rgba(0, 0, 0, .4)",
@@ -108,10 +112,15 @@ export default function Index() {
     </View>;
   }
 
-  if (isError) {
-    console.log("Error fetching products: ", error.message);
-  } else if (!isLoading && !isError) {
+  if (productsIsError && productsError) {
+    console.log("Error fetching products: ", productsError.message);
+  } else if (!productsLoading && !productsIsError) {
     console.log("Products to render:", products);
+  }
+
+  if(user) {
+    console.log("User token: ", user.token);
+    console.log("Cart data: ", cart);
   }
 
   return (
@@ -124,7 +133,7 @@ export default function Index() {
     >
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+          <RefreshControl refreshing={productsRefetch} onRefresh={onRefresh} />
         }
         style={{ width: "100%" }}
       >
@@ -138,10 +147,10 @@ export default function Index() {
         >
           <Text style={theme.text.title}>New Arrivals</Text>
 
-          {!isLoading &&
+          {(!productsLoading &&
             products.map((item) => (
               <Card key={item.id} item={item} cart={userProfile} />
-            )) || <Text>Loading....</Text>}
+            ))) || <Text>Loading....</Text>}
         </View>
       </ScrollView>
     </View>
