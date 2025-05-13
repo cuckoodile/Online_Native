@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { login } from "../functions/authentication/authSlice";
 import GuestAuth from "../components/higher-order-components/GuestAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -19,10 +20,19 @@ const LoginScreen = () => {
     password: "",
   });
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     loginMutation.mutate(data, {
-      onSuccess: (userData) => {
+      onSuccess: async (userData) => {
         dispatch(login(userData.data));
+        if (rememberMe) {
+          try {
+            await AsyncStorage.setItem("userCredentials", JSON.stringify(userData.data)).then((data) => {
+              console.log("User credentials stored successfully:");
+            });
+          } catch (error) {
+            console.error("Failed to store user credentials:", error.message);
+          }
+        }
         handleNavigation("/");
       },
       onError: (error) => {

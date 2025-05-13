@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,8 +51,15 @@ export default function Sidebar({ onOpenChange, isOpen }) {
 
   const handleLogOut = () => {
     logoutMutation.mutate(auth?.token, {
-      onSuccess: (userData) => {
+      onSuccess: async (userData) => {
         console.log("Logout successful", userData);
+
+        try {
+          await AsyncStorage.removeItem("userCredentials");
+          console.log("User credentials removed successfully.");
+        } catch (error) {
+          console.error("Failed to remove user credentials:", error.message);
+        }
 
         dispatch(logout());
         handleNavigation("login");
@@ -111,7 +119,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             <Text>Cart</Text>
           </Pressable>
 
-          {auth ? (
+          {auth && auth.roles[0] === "admin" && (
             <Pressable
               onPress={() => {
                 handleNavigation("admin");
@@ -119,7 +127,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             >
               <Text>Admin</Text>
             </Pressable>
-          ) : null}
+          )}
 
           <Link
             href={{

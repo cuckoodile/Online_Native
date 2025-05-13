@@ -45,10 +45,6 @@ const Header = ({ isDarkMode, setDarkMode }) => {
         <Text>DevSix</Text>
       </Pressable>
 
-      <Pressable onPress={() => alert("Storage", auth ?? "No user")}>
-        <Text>Storage</Text>
-      </Pressable>
-
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
         <Switch
           value={isDarkMode}
