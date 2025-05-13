@@ -12,10 +12,13 @@ import { Link, router } from "expo-router";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import { useLogout } from "@/functions/API/hooks/useAuth";
 import { logout } from "@/functions/authentication/authSlice";
 
 export default function Sidebar({ onOpenChange, isOpen }) {
   const dispatch = useDispatch();
+  const logoutMutation = useLogout();
+
   const auth = useSelector((state) => state.auth.user) ?? null;
 
   const { width } = Dimensions.get("window");
@@ -46,8 +49,18 @@ export default function Sidebar({ onOpenChange, isOpen }) {
   };
 
   const handleLogOut = () => {
-    dispatch(logout);
-    handleNavigation("login");
+    logoutMutation.mutate(auth?.token, {
+      onSuccess: (userData) => {
+        console.log("Logout successful", userData);
+
+        dispatch(logout());
+        handleNavigation("login");
+      },
+      onError: (error) => {
+        console.error("Logout failed:", error.message);
+        Alert.alert("Logout Error", "Failed to log out. Please try again.");
+      },
+    });
   };
 
   return (
@@ -111,7 +124,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           <Link
             href={{
               pathname: "/dynamic-pages/user-profile/[id]",
-              params: { id: "4" },
+              params: { id: auth?.id ? auth.id : "0" },
             }}
             onPress={() => onOpenChange(false)}
           >

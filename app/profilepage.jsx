@@ -74,6 +74,10 @@ const ProfilePage = () => {
     setShowGenderDropdown(false);
   };
 
+  useEffect(() => {
+    alert("Profile id: ", auth);
+  }, []);
+
   return (
     <ScrollView
       style={styles.scrollContainer}
