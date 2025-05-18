@@ -36,7 +36,7 @@ function Profile() {
   const genderOptions = ["Male", "Female", "Others"];
 
   useEffect(() => {
-    console.log("Profile id: ", auth);
+    console.log("User profile: ", auth);
 
     if (!auth) {
       router.replace("login");
@@ -90,7 +90,7 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("name", text)}
               />
             ) : (
-              <Text style={styles.name}>{userData.name}</Text>
+              <Text style={styles.name}>{auth.username}</Text>
             )}
             <Text style={styles.memberStatus}>Active Member</Text>
             {isEditing ? (
@@ -101,7 +101,7 @@ function Profile() {
                 keyboardType="email-address"
               />
             ) : (
-              <Text style={styles.email}>{userData.email}</Text>
+              <Text style={styles.email}>{auth.email}</Text>
             )}
           </View>
 
@@ -130,7 +130,7 @@ function Profile() {
                 keyboardType="email-address"
               />
             ) : (
-              <Text style={styles.infoValue}>{userData.email}</Text>
+              <Text style={styles.infoValue}>{auth.email}</Text>
             )}
           </View>
 
@@ -144,7 +144,7 @@ function Profile() {
                 keyboardType="phone-pad"
               />
             ) : (
-              <Text style={styles.infoValue}>{userData.mobile}</Text>
+              <Text style={styles.infoValue}>{auth.profile.contact_number}</Text>
             )}
           </View>
 
@@ -190,7 +190,7 @@ function Profile() {
                 )}
               </View>
             ) : (
-              <Text style={styles.infoValue}>{userData.birthday}</Text>
+              <Text style={styles.infoValue}>No B-Date in DB!!</Text>
             )}
           </View>
 
@@ -247,7 +247,7 @@ function Profile() {
                 )}
               </View>
             ) : (
-              <Text style={styles.infoValue}>{userData.gender}</Text>
+              <Text style={styles.infoValue}>No Gender in DB!!</Text>
             )}
           </View>
         </View>
@@ -266,7 +266,7 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("name", text)}
               />
             ) : (
-              <Text style={styles.infoValue}>{userData.name}</Text>
+              <Text style={styles.infoValue}>{auth.profile.first_name} {auth.profile.last_name}</Text>
             )}
           </View>
 
@@ -279,7 +279,7 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("address", text)}
               />
             ) : (
-              <Text style={styles.infoValue}>{userData.address}</Text>
+              <Text style={styles.infoValue}>No address in stored auth profile</Text>
             )}
           </View>
 
@@ -306,20 +306,6 @@ function Profile() {
               />
             ) : (
               <Text style={styles.infoValue}>{userData.city}</Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>PhoneNumber</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.phoneNumber}
-                onChangeText={(text) => handleInputChange("phoneNumber", text)}
-                keyboardType="phone-pad"
-              />
-            ) : (
-              <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
             )}
           </View>
         </View>

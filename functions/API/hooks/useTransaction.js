@@ -12,32 +12,32 @@ const api = axios.create({
 });
 
 /* 
-  Hook to fetch all cart that matches the user id
+  Hook to fetch all transaction that matches the user id
 */
 
-export const useGetCart = () => {
+export const useGetTransaction = () => {
   const user = useSelector((state) => state.auth.user) ?? null;
 
   return useQuery({
-    queryKey: ["cart", user?.id],
-    queryFn: () => getCartAPI(user),
+    queryKey: ["transactions", user?.id],
+    queryFn: () => getTransactionAPI(user),
     enabled: !!user,
     onSuccess: (res) => {
-      console.log("Carts data:", res.data);
+      console.log("Transactions data:", res.data);
     },
     staleTime: 1000 * 60 * 5,
   });
 };
 
-const getCartAPI = async (user) => {
+const getTransactionAPI = async (user) => {
   if (!user || !user.token) {
     throw new Error("User is not authenticated");
   }
 
-  console.log("Fetching carts with user:", user);
+  console.log("Fetching transactions with user: ", user);
 
   try {
-    const res = await api.get("/api/carts", null, {
+    const res = await api.get("/api/transactions", null, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
@@ -45,7 +45,7 @@ const getCartAPI = async (user) => {
 
     return res.data;
   } catch (error) {
-    console.error("Carts Error:", error);
-    throw new Error("Failed to fetch carts!");
+    console.error("Transactions Error:", error);
+    throw new Error("Failed to fetch transactions!");
   }
 };

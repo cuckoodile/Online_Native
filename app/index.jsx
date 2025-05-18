@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -34,7 +35,6 @@ const fetchProducts = async () => {
 
 export default function Index() {
   const theme = useTheme();
-  const useCarts = useGetCart();
   const user = useSelector((state) => state.auth.user) ?? null;
 
   const [refreshing, setRefreshing] = useState(false);
@@ -84,10 +84,15 @@ export default function Index() {
     },
   ];
 
+  const handleRefetch = useCallback(() => {
+    productsRefetch();
+    cartRefetch();
+  });
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      refetch();
+      handleRefetch();
       setRefreshing(false);
     }, 500);
   }, []);
@@ -118,7 +123,7 @@ export default function Index() {
     console.log("Products to render:", products);
   }
 
-  if(user) {
+  if (user) {
     console.log("User token: ", user.token);
     console.log("Cart data: ", cart);
   }
@@ -133,11 +138,16 @@ export default function Index() {
     >
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={productsRefetch} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         style={{ width: "100%" }}
       >
         <MyCarousel carouselData={carouselData} />
+
+        <Pressable onPress={() => handleRefetch()}>
+          <Text>Refetch</Text>
+        </Pressable>
+
         <View
           style={{
             paddingHorizontal: 10,

@@ -60,17 +60,17 @@ export default function Card({ item, cart }) {
           }}
         >
           <Text style={{ color: "green" }}>
-            {item?.category.name ?? "No category!"}
+            {item.category.name ?? "No category!"}
           </Text>
 
-          <Text>{item?.name ?? "No title!"}</Text>
+          <Text>{item.name ?? "No title!"}</Text>
 
           {/* Price and Cart */}
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text style={{ color: "green" }}>
-              P{item?.price ?? "No price!"}
+              P{item.price ?? "No price!"}
             </Text>
 
             <Pressable onPress={() => handleCartClick()}>

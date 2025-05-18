@@ -1,110 +1,100 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import Card from '../components/Card';
+import React, { useCallback, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import Card from "../components/Card";
+
+import { useGetProduct } from "../functions/API/hooks/useProduct";
+import { useGetCategory } from "../functions/API/hooks/useCategory";
 
 const CollectionScreen = () => {
-  // Sample data - replace with your actual data
-  const products = [
-    {
-      id: '1',
-      category: 'Pet Products',
-      title: 'Pet Dental Care Kit',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '2',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '3',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '4',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '5',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '6',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '7',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '8',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
-    {
-      id: '9',
-      category: 'Cosmetics',
-      title: 'Organic Shampoo Bar',
-      price: '349',
-      image: '../assets/images/devsix.jpg' 
-    },
+  const {
+    data: products,
+    isLoading: productsLoading,
+    isError: productsIsError,
+    refetch: productsRefetch,
+  } = useGetProduct();
 
-  ];
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    isError: categoriesIsError,
+    refetch: categoriesRefetch,
+  } = useGetCategory();
 
-  return (
-    <View style={styles.container}>
+  const [refreshing, setRefreshing] = useState(false);
 
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>COLLECTION</Text>
-        <Text style={styles.subheader}>
-          Explore our curated selection of premium sustainable fashion pieces designed for the eco-conscious individual.
-        </Text>
+  const handleRefetch = useCallback(() => {
+    productsRefetch();
+    categoriesRefetch();
+  });
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      handleRefetch();
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+  if (productsLoading || categoriesLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
       </View>
+    );
+  }
 
-      <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterItem}>
-          <MaterialIcons name="check-box-outline-blank" size={20} color="#333" />
-          <Text style={styles.filterText}>Filters</Text>
-        </TouchableOpacity>
-        
-        <View style={styles.filterItem}>
-          <Text style={styles.filterText}>Showing {products.length} products</Text>
+  if (productsIsError || categoriesIsError) {
+    return (
+      <View style={styles.container}>
+        <Text>Error loading data</Text>
+      </View>
+    );
+  }
+
+  console.log("All Products Page Items:", products);
+  console.log("All Products Page Categories:", categories);
+
+  if (products.length > 0) {
+    return (
+      <View style={styles.container}>
+        {/* Top Description */}
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>COLLECTION</Text>
+          <Text style={styles.subheader}>
+            Explore our curated selection of premium sustainable fashion pieces
+            designed for the eco-conscious individual.
+          </Text>
         </View>
-      </View>
 
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        renderItem={({ item }) => (
-          <Card item={item} style={styles.card} />
+        {/* Product Cards Section */}
+        {(products.length > 0 && (
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            contentContainerStyle={styles.cardContainer}
+          >
+            {products.map((item) => (
+              <Card key={item.id} item={item} />
+            ))}
+          </ScrollView>
+        )) || (
+          <View>
+            <Text>No products available</Text>
+          </View>
         )}
-        contentContainerStyle={styles.listContent}
-      />
-    </View>
-  );
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -114,42 +104,20 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 16,
-
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 8,
-  
   },
   subheader: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
-  filterRow: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    justifyContent: 'center',
-  },
-  filterItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 8,
-  },
-  filterText: {
-    marginLeft: 4,
-  },
-  listContent: {
-    paddingBottom: 16,
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  card: {
-    width: '48%', 
+  cardContainer: {
+    gap: 15,
   },
 });
 
