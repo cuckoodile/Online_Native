@@ -156,12 +156,10 @@ const ProfilePage = () => {
 
             {isEditing ? (
               <View>
-                {/* Date Display Touchable */}
                 <TouchableOpacity onPress={showPicker} style={styles.dateInput}>
                   <Text style={styles.infoValue}>{userData.birthday}</Text>
                 </TouchableOpacity>
 
-                {/* Date Picker */}
                 {showDatePicker && (
                   <View style={styles.pickerContainer}>
                     {Platform.OS === "ios" && (
@@ -202,7 +200,6 @@ const ProfilePage = () => {
             {isEditing ? (
               <View style={{ position: "relative", zIndex: 10 }}>
                 {" "}
-                {/* Fix for iOS clipping */}
                 <TouchableOpacity
                   style={[styles.infoValue, styles.input]}
                   onPress={() => setShowGenderDropdown(!showGenderDropdown)}
@@ -240,7 +237,7 @@ const ProfilePage = () => {
                         style={styles.dropdownOption}
                         onPress={() => {
                           handleGenderSelect(option);
-                          setShowGenderDropdown(false); // Auto-close on select
+                          setShowGenderDropdown(false); 
                         }}
                       >
                         <Text>{option}</Text>
