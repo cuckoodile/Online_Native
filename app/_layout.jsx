@@ -48,7 +48,7 @@ export default function RootLayout() {
                     />
                   ),
                 }}
-              ></Stack>
+              />
             </SafeAreaProvider>
           </NetInfoProvider>
         </PaperProvider>

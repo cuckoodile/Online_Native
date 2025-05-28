@@ -45,7 +45,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
   }, [isOpen]);
 
   const handleNavigation = (path) => {
-    router.replace(`${path}`);
+    router.replace(`/${path}`);
     onOpenChange(false);
   };
 
@@ -113,25 +113,31 @@ export default function Sidebar({ onOpenChange, isOpen }) {
 
           <Pressable
             onPress={() => {
-              handleNavigation("cart");
+              if (auth) {
+                handleNavigation(`profile/${auth.id}/mycart`);
+              } else {
+                handleNavigation("login");
+              }
             }}
           >
-            <Text>Cart</Text>
+            <Text>My Cart</Text>
           </Pressable>
 
-          {auth && auth.roles[0] === "admin" && (
-            <Pressable
-              onPress={() => {
-                handleNavigation("admin");
-              }}
-            >
-              <Text>Admin</Text>
-            </Pressable>
-          )}
+          <Pressable
+            onPress={() => {
+              if (auth) {
+                handleNavigation(`profile/${auth.id}/mypurchase`);
+              } else {
+                handleNavigation("login");
+              }
+            }}
+          >
+            <Text>My Purchase</Text>
+          </Pressable>
 
           <Link
             href={{
-              pathname: "/dynamic-pages/user-profile/[id]",
+              pathname: "/profile/[id]",
               params: { id: auth?.id ? auth.id : "0" },
             }}
             onPress={() => onOpenChange(false)}

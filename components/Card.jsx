@@ -1,22 +1,9 @@
-import { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 
-export default function Card({ item, cart }) {
-  const [onCart, setCart] = useState(cart?.includes(item?.id) ? true : false);
-  const navigation = useNavigation();
-
-  const cartSize = 23;
-
-  function handleCartClick() {
-    setCart(!onCart);
-  }
-
+export default function Card({ item }) {
   const handleProductNavigation = (id) => {
-    router.replace(`/dynamic-pages/product/${id}`);
+    router.replace(`/product/${id}/`);
   };
 
   return (
@@ -72,24 +59,6 @@ export default function Card({ item, cart }) {
             <Text style={{ color: "green" }}>
               P{item.price ?? "No price!"}
             </Text>
-
-            <Pressable onPress={() => handleCartClick()}>
-              <View
-                style={{
-                  width: cartSize * 1.7,
-                  height: cartSize * 1.7,
-                  borderRadius: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderWidth: 1,
-                }}
-              >
-                <Ionicons
-                  name={onCart ? "checkmark" : "cart-outline"}
-                  size={cartSize}
-                />
-              </View>
-            </Pressable>
           </View>
         </View>
       </Pressable>

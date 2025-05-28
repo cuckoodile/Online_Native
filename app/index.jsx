@@ -52,15 +52,6 @@ export default function Index() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const {
-    data: cart,
-    isLoading: cartLoading,
-    isError: cartIsError,
-    error: cartError,
-    refetch: cartRefetch,
-    isRefetching: cartIsRefetching,
-  } = useGetCart(user);
-
   const carouselData = [
     {
       id: 1,
@@ -86,7 +77,6 @@ export default function Index() {
 
   const handleRefetch = useCallback(() => {
     productsRefetch();
-    cartRefetch();
   });
 
   const onRefresh = useCallback(() => {
@@ -125,7 +115,6 @@ export default function Index() {
 
   if (user) {
     console.log("User token: ", user.token);
-    console.log("Cart data: ", cart);
   }
 
   return (
@@ -159,7 +148,7 @@ export default function Index() {
 
           {(!productsLoading &&
             products.map((item) => (
-              <Card key={item.id} item={item} cart={userProfile} />
+              <Card key={item.id} item={item} />
             ))) || <Text>Loading....</Text>}
         </View>
       </ScrollView>

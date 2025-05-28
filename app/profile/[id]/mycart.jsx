@@ -10,7 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
-import UserAuth from "../components/higher-order-components/UserAuth";
+import UserAuth from "../../../components/higher-order-components/UserAuth";
 import { router } from "expo-router";
 
 const ShoppingCartScreen = () => {
@@ -45,8 +45,8 @@ const ShoppingCartScreen = () => {
   useEffect(() => {
     console.log("Cart owner id: ", auth);
 
-    if(!auth) {
-      router.replace("login")
+    if (!auth) {
+      router.replace("login");
     }
   }, [auth]);
 
@@ -265,58 +265,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#4285F4",
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  summaryLabel: {
-    fontSize: 16,
-    color: "#666",
-  },
-  summaryValue: {
-    fontSize: 16,
-  },
-  summaryTotal: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  promoSection: {
-    marginBottom: 32,
-  },
-  promoInputContainer: {
-    flexDirection: "row",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  promoInput: {
-    flex: 1,
-    padding: 12,
-    fontSize: 16,
-  },
-  applyButton: {
-    backgroundColor: "#4285F4",
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  applyButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  orderSummary: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 16,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
   },
   summaryRow: {
     flexDirection: "row",

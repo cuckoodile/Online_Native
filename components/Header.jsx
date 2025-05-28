@@ -17,12 +17,8 @@ const Header = ({ isDarkMode, setDarkMode }) => {
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNavigation = (path, params) => {
-    if (params?.id) {
-      router.replace(`/dynamic-pages/user-profile/${params.id}`);
-    } else {
-      router.replace(`/${path}`);
-    }
+  const handleNavigation = (path) => {
+    router.replace(`${path}`);
   };
 
   return (
@@ -41,7 +37,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
         zIndex: 10,
       }}
     >
-      <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("")}>
+      <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("/")}>
         <Text>DevSix</Text>
       </Pressable>
 
@@ -62,24 +58,24 @@ const Header = ({ isDarkMode, setDarkMode }) => {
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
           onPress={() =>
-            auth ? handleNavigation("cart") : handleNavigation("login")
+            auth
+              ? handleNavigation(`/profile/${auth.id}/mycart`)
+              : handleNavigation("login")
           }
         >
           <Ionicons name="cart-outline" size={27} color="black" />
         </Pressable>
-
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
           onPress={() =>
             auth
-              ? handleNavigation("[id]", { id: auth?.id })
+              ? handleNavigation(`/profile/${auth.id}`)
               : handleNavigation("login")
           }
         >
           <Ionicons name="person-circle-outline" size={27} color="black" />
         </Pressable>
-
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}

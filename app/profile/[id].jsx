@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import UserAuth from "../../../components/higher-order-components/UserAuth";
+import UserAuth from "../../components/higher-order-components/UserAuth";
 import { useSelector } from "react-redux";
 
 function Profile() {
