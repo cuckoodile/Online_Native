@@ -15,18 +15,22 @@ import { useTheme } from "react-native-paper";
 import { BASE_URL } from "../../functions/API/config";
 import { useQuery } from "@tanstack/react-query";
 
-const api = axios.create({
-  baseURL: BASE_URL,
-});
-
 const fetchProducts = async (id) => {
   console.log(`Fetching product from: ${BASE_URL}/api/products/${id}`);
+  
   try {
-    const response = await api.get(`/api/products/${id}`);
-    return response.data.data;
+    const response = await fetch(`${BASE_URL}/api/products/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch product id: ${id}`)
+    }
+
+    const res = await JSON.parse(response);
+
+    console.log(`Fetch response from product id: ${id} \n ${res}`);
+    return res.data;
   } catch (error) {
-    console.error("API Error:", error);
-    throw new Error("Failed to fetch product");
+    console.error(`Failed to fetch product id: ${id} \n ${error.message}`);
+    throw new Error(`Failed to fetch product id: ${id}`);
   }
 };
 
@@ -162,22 +166,7 @@ export default function Product() {
         )}
 
         <View style={styles.detailsContainer}>
-          {Object.entries(product).map(([key, value]) => {
-            if (["product_image", "id"].includes(key)) return null;
 
-            if (value == null) return null;
-
-            return (
-              <View key={key} style={styles.detailRow}>
-                <Text style={styles.detailLabel}>
-                  {key.replace(/_/g, " ").toUpperCase()}:
-                </Text>
-                <Text style={styles.detailValue}>
-                  {renderObjectValue(value)}
-                </Text>
-              </View>
-            );
-          })}
         </View>
       </ScrollView>
     </View>
