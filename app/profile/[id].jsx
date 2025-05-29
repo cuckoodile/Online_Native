@@ -14,34 +14,36 @@ import UserAuth from "../../components/higher-order-components/UserAuth";
 import { useSelector } from "react-redux";
 
 function Profile() {
-  const auth = useSelector((state) => state.auth.user) ?? null;
+  const auth = useSelector((state) => state.auth.user);
+  const userId = auth?.id;
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-  const [userData, setUserData] = useState({
-    name: "Zanjoe Gonzales",
-    email: "zanjoegonzales519@gmail.com",
-    mobile: "09*******",
-    birthdayDate: new Date("May 19 2006"),
-    gender: "Male",
-    address: "Pateros",
-    postcode: "Metro Manila–Pasig,Pasig",
-    city: "Maybunga",
-    phoneNumber: "09** *** ***",
-    birthday: "Nov 1, 1990",
-    birthdayDate: new Date(1990, 10, 1),
-  });
+  const [userData, setUserData] = useState(null); 
 
   const genderOptions = ["Male", "Female", "Others"];
 
   useEffect(() => {
-    console.log("User profile: ", auth);
-
     if (!auth) {
       router.replace("login");
+      return;
     }
-  }, [auth]);
+    if (!userId) return;
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(
+          `http://192.168.254.108:8000/api/users/${userId}`,
+        );
+        if (!response.ok) throw new Error("Failed to fetch user data");
+        const data = await response.json();
+        setUserData(data);
+      } catch (err) {
+        setUserData(null);
+      }
+    };
+    fetchUserData();
+  }, [auth, userId]);
 
   const handleEditPress = () => {
     setIsEditing(!isEditing);
@@ -74,6 +76,14 @@ function Profile() {
     setUserData({ ...userData, gender });
     setShowGenderDropdown(false);
   };
+
+  if (!userData) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -266,7 +276,9 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("name", text)}
               />
             ) : (
-              <Text style={styles.infoValue}>{auth.profile.first_name} {auth.profile.last_name}</Text>
+              <Text style={styles.infoValue}>
+                {auth.profile.first_name} {auth.profile.last_name}
+              </Text>
             )}
           </View>
 
@@ -279,7 +291,9 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("address", text)}
               />
             ) : (
-              <Text style={styles.infoValue}>No address in stored auth profile</Text>
+              <Text style={styles.infoValue}>
+                No address in stored auth profile
+              </Text>
             )}
           </View>
 
@@ -535,6 +549,11 @@ const styles = StyleSheet.create({
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
