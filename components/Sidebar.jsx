@@ -49,7 +49,10 @@ export default function Sidebar({ onOpenChange, isOpen }) {
     onOpenChange(false);
   };
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
+    // await AsyncStorage.removeItem("userCredentials");
+
+    
     logoutMutation.mutate(auth?.token, {
       onSuccess: async (userData) => {
         console.log("Logout successful", userData);

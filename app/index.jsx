@@ -147,7 +147,7 @@ export default function Index() {
           <Text style={theme.text.title}>New Arrivals</Text>
 
           {(!productsLoading &&
-            products.map((item) => (
+            products?.map((item) => (
               <Card key={item.id} item={item} />
             ))) || <Text>Loading....</Text>}
         </View>

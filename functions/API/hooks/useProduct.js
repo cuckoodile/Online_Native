@@ -24,7 +24,7 @@ export const useGetProduct = () => {
     staleTime: 1000 * 60 * 5,
     onSuccess: (res) => {
       console.log("Products data:", res);
-    },
+    }, 
   });
 };
 

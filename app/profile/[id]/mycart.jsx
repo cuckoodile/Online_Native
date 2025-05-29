@@ -80,7 +80,7 @@ const ShoppingCartScreen = () => {
       <View style={styles.divider} />
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Product</Text>
-        {cartItems.map((item) => (
+        {cartItems?.map((item) => (
           <View key={item.id} style={styles.cartItem}>
             <View style={styles.productInfo}>
               <Text style={styles.productName}>{item.name}</Text>

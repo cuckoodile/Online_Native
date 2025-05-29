@@ -27,7 +27,7 @@ const LoginScreen = () => {
         if (rememberMe) {
           try {
             await AsyncStorage.setItem("userCredentials", JSON.stringify(userData.data)).then((data) => {
-              console.log("User credentials stored successfully:");
+              console.log("User credentials stored successfully:", data);
             });
           } catch (error) {
             console.error("Failed to store user credentials:", error.message);
