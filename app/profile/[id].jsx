@@ -13,38 +13,23 @@ import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import UserAuth from "../../components/higher-order-components/UserAuth";
 import { useSelector } from "react-redux";
+import useUser from "../../functions/API/hooks/useUser";
 
 function Profile() {
   const auth = useSelector((state) => state.auth.user);
-  const userId = auth?.id;
+  // const useUserQuery = new useUser();
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-  const [userData, setUserData] = useState(null);
+
+  const {
+    data: userData,
+    isLoading: userLoading,
+    isError: userIsError,
+  } = useUser(auth?.id, auth?.token);
 
   const genderOptions = ["Male", "Female", "Others"];
-
-  useEffect(() => {
-    if (!auth) {
-      router.replace("login");
-      return;
-    }
-    if (!userId) return;
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(
-          `http://192.168.254.108:8000/api/users/${userId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch user data");
-        const data = await response.json();
-        setUserData(data);
-      } catch (err) {
-        setUserData(null);
-      }
-    };
-    fetchUserData();
-  }, [auth, userId]);
 
   const handleEditPress = () => {
     setIsEditing(!isEditing);
@@ -108,6 +93,14 @@ function Profile() {
     );
   }
 
+  if (userIsError) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Error fetching user</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={styles.scrollContainer}
@@ -135,19 +128,10 @@ function Profile() {
                 onChangeText={(text) => handleInputChange("name", text)}
               />
             ) : (
-              <Text style={styles.name}>{auth.username}</Text>
+              <Text style={styles.name}>{userData?.username}</Text>
             )}
+
             <Text style={styles.memberStatus}>Active Member</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.email, styles.input]}
-                value={userData.email}
-                onChangeText={(text) => handleInputChange("email", text)}
-                keyboardType="email-address"
-              />
-            ) : (
-              <Text style={styles.email}>{auth.email}</Text>
-            )}
           </View>
 
           <TouchableOpacity style={styles.editButton} onPress={handleEditPress}>
@@ -175,7 +159,7 @@ function Profile() {
                 keyboardType="email-address"
               />
             ) : (
-              <Text style={styles.infoValue}>{auth.email}</Text>
+              <Text style={styles.infoValue}>{userData?.email}</Text>
             )}
           </View>
 
@@ -190,108 +174,8 @@ function Profile() {
               />
             ) : (
               <Text style={styles.infoValue}>
-                {auth.profile.contact_number}
+                {userData?.profile?.contact_number || "No Mobile in DB!!"}
               </Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Birthday</Text>
-
-            {isEditing ? (
-              <View>
-                <TouchableOpacity onPress={showPicker} style={styles.dateInput}>
-                  <Text style={styles.infoValue}>{userData.birthday}</Text>
-                </TouchableOpacity>
-
-                {showDatePicker && (
-                  <View style={styles.pickerContainer}>
-                    {Platform.OS === "ios" && (
-                      <View style={styles.iosHeader}>
-                        <TouchableOpacity
-                          onPress={() => setShowDatePicker(false)}
-                          style={styles.cancelButton}
-                        >
-                          <Text style={styles.cancelText}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => setShowDatePicker(false)}
-                          style={styles.doneButton}
-                        >
-                          <Text style={styles.doneText}>Done</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-
-                    <DateTimePicker
-                      value={userData.birthdayDate}
-                      mode="date"
-                      display={Platform.OS === "ios" ? "inline" : "default"}
-                      onChange={handleDateChange}
-                      maximumDate={new Date()}
-                      style={styles.datePicker}
-                    />
-                  </View>
-                )}
-              </View>
-            ) : (
-              <Text style={styles.infoValue}>No B-Date in DB!!</Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Gender</Text>
-            {isEditing ? (
-              <View style={{ position: "relative", zIndex: 10 }}>
-                {" "}
-                <TouchableOpacity
-                  style={[styles.infoValue, styles.input]}
-                  onPress={() => setShowGenderDropdown(!showGenderDropdown)}
-                >
-                  <Text>{userData.gender}</Text>
-                  <MaterialIcons
-                    name={
-                      showGenderDropdown ? "arrow-drop-up" : "arrow-drop-down"
-                    }
-                    size={20}
-                    color="#666"
-                    style={{ position: "absolute", right: 10 }}
-                  />
-                </TouchableOpacity>
-                {showGenderDropdown && (
-                  <View
-                    style={[
-                      styles.dropdown,
-                      Platform.select({
-                        ios: {
-                          shadowColor: "#000",
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: 0.2,
-                          shadowRadius: 4,
-                        },
-                        android: {
-                          elevation: 5,
-                        },
-                      }),
-                    ]}
-                  >
-                    {genderOptions.map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={styles.dropdownOption}
-                        onPress={() => {
-                          handleGenderSelect(option);
-                          setShowGenderDropdown(false);
-                        }}
-                      >
-                        <Text>{option}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ) : (
-              <Text style={styles.infoValue}>No Gender in DB!!</Text>
             )}
           </View>
         </View>
@@ -311,7 +195,7 @@ function Profile() {
               />
             ) : (
               <Text style={styles.infoValue}>
-                {auth.profile.first_name} {auth.profile.last_name}
+                {userData?.profile?.first_name} {userData?.profile?.last_name}
               </Text>
             )}
           </View>

@@ -1,54 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   ScrollView,
+  RefreshControl,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import UserAuth from "../../../components/higher-order-components/UserAuth";
-import { router } from "expo-router";
-import { useGetCart, useUpdateCartQuantity } from '../../../functions/API/hooks/useCart';
+import { useGetCart } from "../../../functions/API/hooks/useCart";
+import CartProductCard from "../../../components/cards/CartProductCard";
+import { Pressable } from "react-native";
+import CheckoutModal from "../../../components/modals/CheckoutModal";
 
 const ShoppingCartScreen = () => {
-  const auth = useSelector((state) => state.auth.user) ?? null;
-  const { data, isLoading, isError } = useGetCart();
-  const { mutate: updateCartQuantity } = useUpdateCartQuantity();
   const navigation = useNavigation();
-  const cartItems = data || [];
-  const [promoCode, setPromoCode] = useState("");
-  const [discount, setDiscount] = useState(0);
+  const auth = useSelector((state) => state.auth.user) ?? null;
+  const { data, isLoading, isError, refetch } = useGetCart(
+    auth?.id,
+    auth?.token
+  );
 
-  useEffect(() => {
-    console.log("Cart owner id: ", auth);
-    if (!auth) {
-      router.replace("login");
-    }
-  }, [auth]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
 
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    updateCartQuantity({ itemId: id, quantity: newQuantity });
-  };
+  const shippingCost = 54;
 
-  const subtotal = Array.isArray(cartItems)
-    ? cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    : 0;
-  const shipping = 0;
-  const total = subtotal + shipping - discount;
-
-  const applyPromoCode = () => {
-    if (promoCode === "EC020") {
-      setDiscount(subtotal * 0.2);
-    } else {
-      setDiscount(0);
-      alert('Invalid promo code. Try "EC020" for 20% off');
-    }
-  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      refetch();
+      setRefreshing(false);
+    }, 500);
+  }, []);
 
   if (isLoading) {
     return (
@@ -66,100 +54,115 @@ const ShoppingCartScreen = () => {
     );
   }
 
+  // Only include checked items in subtotal/total
+  const checkedProducts = Array.isArray(data)
+    ? data.filter((item) => checkedItems[item.id])
+    : [];
+
+  // Create the array of selected products with all product data
+  const selectedProducts = checkedProducts;
+
+  const subtotal = checkedProducts.reduce(
+    (sum, item) => sum + Number(item?.product?.price) * item?.quantity,
+    0
+  );
+  const total = subtotal + shippingCost;
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Your Shopping Cart</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("AllProducts")}
-          style={styles.continueShopping}
-        >
-          <Text style={styles.continueShoppingText}>Continue Shopping</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.divider} />
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Product</Text>
-        {cartItems?.map((item) => (
-          <View key={item.id} style={styles.cartItem}>
-            <View style={styles.productInfo}>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productCategory}>{item.category}</Text>
-            </View>
-            <View style={styles.quantityControls}>
-              <Text style={styles.priceText}>
-                P{item.price?.toLocaleString?.() ?? item.price}
-              </Text>
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity
-                  onPress={() => updateQuantity(item.id, item.quantity - 1)}
-                  style={styles.quantityButton}
-                >
-                  <MaterialIcons name="remove" size={20} color="#333" />
-                </TouchableOpacity>
-                <Text style={styles.quantityText}>{item.quantity}</Text>
-                <TouchableOpacity
-                  onPress={() => updateQuantity(item.id, item.quantity + 1)}
-                  style={styles.quantityButton}
-                >
-                  <MaterialIcons name="add" size={20} color="#333" />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.itemTotal}>
-                + P{(item.price * item.quantity)?.toLocaleString?.() ?? (item.price * item.quantity)}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-      <View style={styles.orderSummary}>
-        <Text style={styles.summaryTitle}>Order Summary</Text>
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Subtotal</Text>
-          <Text style={styles.summaryValue}>P{subtotal.toLocaleString()}</Text>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#fff",
+        paddingTop: 16,
+        paddingBottom: 10,
+      }}
+    >
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={styles.container}
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Your Shopping Cart</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("allproducts")}
+            style={styles.continueShopping}
+          >
+            <Text style={styles.continueShoppingText}>Continue Shopping</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Shipping</Text>
-          <Text style={styles.summaryValue}>Free</Text>
-        </View>
-        <View style={styles.promoSection}>
-          <Text style={styles.summaryLabel}>Promo Code</Text>
-          <View style={styles.promoRow}>
-            <TextInput
-              style={styles.promoInput}
-              placeholder="Enter code"
-              value={promoCode}
-              onChangeText={setPromoCode}
+        <Text style={styles.sectionTitle}>Products</Text>
+        <View style={styles.divider} />
+        <View style={styles.section}>
+          {data?.map((item) => (
+            <CartProductCard
+              key={item.id}
+              item={item}
+              token={auth?.token}
+              refetch={refetch}
+              checked={!!checkedItems[item.id]}
+              onCheckChange={(checked) =>
+                setCheckedItems((prev) => ({ ...prev, [item.id]: checked }))
+              }
             />
-            <TouchableOpacity
-              style={styles.applyButton}
-              onPress={applyPromoCode}
-            >
-              <Text style={styles.applyButtonText}>Apply</Text>
-            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.orderSummary}>
+          <Text style={styles.summaryTitle}>Order Summary</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal</Text>
+            <Text style={styles.summaryValue}>
+              P
+              {subtotal.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Text>
           </View>
-          <Text style={styles.promoHint}>Try code: EC020 for 20% off</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Shipping</Text>
+            <Text style={styles.summaryValue}>P{shippingCost}</Text>
+          </View>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalValue}>
+              P
+              {total.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Text>
+          </View>
+          <Text style={styles.freeShippingText}>
+            You've qualified for free shipping!
+          </Text>
         </View>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>P{total.toLocaleString()}</Text>
-        </View>
-        <Text style={styles.freeShippingText}>
-          You've qualified for free shipping!
-        </Text>
-      </View>
-      <TouchableOpacity style={styles.checkoutButton}>
-        <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <Pressable
+          android_ripple={{ color: "black" }}
+          onPress={() => setModalVisible(true)}
+          style={styles.checkoutButton}
+        >
+          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+        </Pressable>
+      </ScrollView>
+
+      {/* Modal */}
+      <CheckoutModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        items={selectedProducts}
+        subtotal={subtotal}
+        total={total}
+        shippingCost={shippingCost}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 16,
   },
   header: {
     marginBottom: 16,

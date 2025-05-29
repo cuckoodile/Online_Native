@@ -3,46 +3,45 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../config";
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-});
-
 /* 
   Hook to fetch all cart that matches the user id
 */
 
-export const useGetCart = () => {
-  const user = useSelector((state) => state.auth.user) ?? null;
-
+export const useGetCart = (id, token) => {
   return useQuery({
-    queryKey: ["cart", user?.id],
-    queryFn: () => getCartAPI(user),
-    enabled: !!user,
+    queryKey: ["carts"],
+    queryFn: () => getCartAPI(id, token),
     onSuccess: (res) => {
-      console.log("Carts data:", res.data);
+      console.log("Carts data:", res);
     },
+    enabled: !!id && !!token,
+    retry: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     staleTime: 1000 * 60 * 5,
   });
 };
 
-const getCartAPI = async (user) => {
-  if (!user || !user.token) {
+const getCartAPI = async (id, token) => {
+  if (!id || !token) {
     throw new Error("User is not authenticated");
   }
 
-  console.log("Fetching carts with user:", user);
-
   try {
-    const res = await api.get("/api/carts", {
+    const response = await fetch(`${BASE_URL}/api/carts`, {
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
+    if (!response.ok) {
+      throw new Error("Error fetching carts for user id: " + id);
+    }
+
+    const res = await response.json();
     return res.data;
   } catch (error) {
     console.error("Carts Error:", error);
@@ -51,20 +50,28 @@ const getCartAPI = async (user) => {
 };
 
 // Update cart item quantity API
-const updateCartQuantityAPI = async ({ user, itemId, quantity }) => {
-  if (!user || !user.token) {
+const updateCartQuantityAPI = async ({ token, itemId, quantity }) => {
+
+  if (!token) {
     throw new Error("User is not authenticated");
   }
+
   try {
-    const res = await api.patch(
-      `/api/carts/${itemId}`,
-      { quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BASE_URL}/api/carts/${itemId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ quantity }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error updating cart item with id: " + itemId);
+    }
+
+    const res = await response.json();
     return res.data;
   } catch (error) {
     console.error("Update Cart Error:", error);
@@ -74,12 +81,14 @@ const updateCartQuantityAPI = async ({ user, itemId, quantity }) => {
 
 // Custom hook for updating cart quantity
 export const useUpdateCartQuantity = () => {
-  const user = useSelector((state) => state.auth.user) ?? null;
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ itemId, quantity }) => updateCartQuantityAPI({ user, itemId, quantity }),
+    mutationFn: ({ token, itemId, quantity }) =>
+      updateCartQuantityAPI({ token, itemId, quantity }),
     onSuccess: () => {
-      queryClient.invalidateQueries(["cart", user?.id]);
+      queryClient.invalidateQueries(["carts"]);
+      console.log("Cart updated successfully");
     },
   });
 };
