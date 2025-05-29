@@ -12,39 +12,19 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import UserAuth from "../../../components/higher-order-components/UserAuth";
 import { router } from "expo-router";
+import { useGetCart, useUpdateCartQuantity } from '../../../functions/API/hooks/useCart';
 
 const ShoppingCartScreen = () => {
   const auth = useSelector((state) => state.auth.user) ?? null;
-
+  const { data, isLoading, isError } = useGetCart();
+  const { mutate: updateCartQuantity } = useUpdateCartQuantity();
   const navigation = useNavigation();
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "Natural Face Serum",
-      category: "Cosmetics",
-      price: 1299,
-      quantity: 1,
-    },
-    {
-      id: "2",
-      name: "Organic Pet Shampoo",
-      category: "Pet Products",
-      price: 449,
-      quantity: 2,
-    },
-    {
-      id: "3",
-      name: "Bamboo Cleaning Set",
-      category: "Household Essentials",
-      price: 899,
-      quantity: 1,
-    },
-  ]);
+  const cartItems = data || [];
   const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
 
   useEffect(() => {
     console.log("Cart owner id: ", auth);
-
     if (!auth) {
       router.replace("login");
     }
@@ -52,19 +32,14 @@ const ShoppingCartScreen = () => {
 
   const updateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    updateCartQuantity({ itemId: id, quantity: newQuantity });
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const subtotal = Array.isArray(cartItems)
+    ? cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    : 0;
   const shipping = 0;
-  const total = subtotal + shipping;
+  const total = subtotal + shipping - discount;
 
   const applyPromoCode = () => {
     if (promoCode === "EC020") {
@@ -74,6 +49,22 @@ const ShoppingCartScreen = () => {
       alert('Invalid promo code. Try "EC020" for 20% off');
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading cart...</Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.container}>
+        <Text>Failed to load cart.</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -86,9 +77,7 @@ const ShoppingCartScreen = () => {
           <Text style={styles.continueShoppingText}>Continue Shopping</Text>
         </TouchableOpacity>
       </View>
-
       <View style={styles.divider} />
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Product</Text>
         {cartItems.map((item) => (
@@ -97,12 +86,10 @@ const ShoppingCartScreen = () => {
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.productCategory}>{item.category}</Text>
             </View>
-
             <View style={styles.quantityControls}>
               <Text style={styles.priceText}>
-                P{item.price.toLocaleString()}
+                P{item.price?.toLocaleString?.() ?? item.price}
               </Text>
-
               <View style={styles.quantityContainer}>
                 <TouchableOpacity
                   onPress={() => updateQuantity(item.id, item.quantity - 1)}
@@ -110,9 +97,7 @@ const ShoppingCartScreen = () => {
                 >
                   <MaterialIcons name="remove" size={20} color="#333" />
                 </TouchableOpacity>
-
                 <Text style={styles.quantityText}>{item.quantity}</Text>
-
                 <TouchableOpacity
                   onPress={() => updateQuantity(item.id, item.quantity + 1)}
                   style={styles.quantityButton}
@@ -120,28 +105,23 @@ const ShoppingCartScreen = () => {
                   <MaterialIcons name="add" size={20} color="#333" />
                 </TouchableOpacity>
               </View>
-
               <Text style={styles.itemTotal}>
-                + P{(item.price * item.quantity).toLocaleString()}
+                + P{(item.price * item.quantity)?.toLocaleString?.() ?? (item.price * item.quantity)}
               </Text>
             </View>
           </View>
         ))}
       </View>
-
       <View style={styles.orderSummary}>
         <Text style={styles.summaryTitle}>Order Summary</Text>
-
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Subtotal</Text>
           <Text style={styles.summaryValue}>P{subtotal.toLocaleString()}</Text>
         </View>
-
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Shipping</Text>
           <Text style={styles.summaryValue}>Free</Text>
         </View>
-
         <View style={styles.promoSection}>
           <Text style={styles.summaryLabel}>Promo Code</Text>
           <View style={styles.promoRow}>
@@ -160,17 +140,14 @@ const ShoppingCartScreen = () => {
           </View>
           <Text style={styles.promoHint}>Try code: EC020 for 20% off</Text>
         </View>
-
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total</Text>
           <Text style={styles.totalValue}>P{total.toLocaleString()}</Text>
         </View>
-
         <Text style={styles.freeShippingText}>
           You've qualified for free shipping!
         </Text>
       </View>
-
       <TouchableOpacity style={styles.checkoutButton}>
         <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
       </TouchableOpacity>
