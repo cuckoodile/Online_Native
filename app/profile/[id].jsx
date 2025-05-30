@@ -1,91 +1,48 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Platform,
-  Image,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import UserAuth from "../../components/higher-order-components/UserAuth";
 import { useSelector } from "react-redux";
 import useUser from "../../functions/API/hooks/useUser";
 
 function Profile() {
   const auth = useSelector((state) => state.auth.user);
-  // const useUserQuery = new useUser();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-
   const {
     data: userData,
     isLoading: userLoading,
     isError: userIsError,
   } = useUser(auth?.id, auth?.token);
 
-  const genderOptions = ["Male", "Female", "Others"];
-
-  const handleEditPress = () => {
-    setIsEditing(!isEditing);
-    setShowGenderDropdown(false);
-  };
-
-  const handleDateChange = (event, selectedDate) => {
-    if (Platform.OS === "android") {
-      setShowDatePicker(false);
-    }
-
-    if (selectedDate) {
-      setUserData({
-        ...userData,
-        birthday: selectedDate.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }),
-        birthdayDate: selectedDate,
-      });
-    }
-  };
-
-  const showPicker = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleGenderSelect = (gender) => {
-    setUserData({ ...userData, gender });
-    setShowGenderDropdown(false);
-  };
-
+  // Helper to get profile image
   const getProfileImageUrl = (userData) => {
-    if (!userData || !userData.profile || !userData.profile.image) return null;
-    return `http://apidevsixtech.styxhydra.com/assets/media/users/${userData.profile.image}`;
+    if (!userData || !userData.profile || !userData.profile.profile_image)
+      return null;
+    return userData.profile.profile_image;
   };
 
-  const getUserAddress = (userData) => {
-    if (!userData || !userData.address)
-      return "No address in stored user profile";
-    
-    const addressObj = userData.address;
-
-    const addressParts = [];
-    if (addressObj.house_address) addressParts.push(addressObj.house_address);
-    if (addressObj.barangay) addressParts.push(addressObj.barangay);
-    if (addressObj.city) addressParts.push(addressObj.city);
-    if (addressObj.region) addressParts.push(addressObj.region);
-    if (addressObj.zip_code) addressParts.push(addressObj.zip_code);
-    return addressParts.length > 0
-      ? addressParts.join(", ")
-      : "No address in stored user profile";
+  // Helper to get full address details
+  const getUserAddressDetails = (address) => {
+    if (!address) return null;
+    return [
+      { label: "Address Name", value: address.name },
+      { label: "House Address", value: address.house_address },
+      { label: "Region", value: address.region },
+      { label: "Province", value: address.province },
+      { label: "City", value: address.city },
+      { label: "Barangay", value: address.baranggay },
+      { label: "Zip Code", value: address.zip_code },
+    ].filter((item) => item.value && item.value !== "null");
   };
 
-  if (!userData) {
+  // Helper to get 5 latest transactions
+  const getLatestTransactions = (transactions) => {
+    if (!transactions || !Array.isArray(transactions)) return [];
+    return [...transactions]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 5);
+  };
+
+  if (userLoading || !userData) {
     return (
       <View style={styles.loadingContainer}>
         <Text>Loading...</Text>
@@ -101,174 +58,91 @@ function Profile() {
     );
   }
 
+  const profile = userData.profile || {};
+  const address = userData.address || {};
+  const transactions = userData.transactions || [];
+  const addressDetails = getUserAddressDetails(address);
+  const latestTransactions = getLatestTransactions(transactions);
+
+  console.log("Profile URL:", auth?.profile?.profile_image);
+
   return (
     <ScrollView
       style={styles.scrollContainer}
       showsVerticalScrollIndicator={false}
     >
+      {/* User Info Card */}
       <View style={styles.card}>
-        <View style={styles.header}>
-          <View>
-            {getProfileImageUrl(userData) && (
-              <Image
-                source={{ uri: getProfileImageUrl(userData) }}
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
-                  marginBottom: 12,
-                }}
-                resizeMode="cover"
-              />
-            )}
-            {isEditing ? (
-              <TextInput
-                style={[styles.name, styles.input]}
-                value={userData.name}
-                onChangeText={(text) => handleInputChange("name", text)}
-              />
-            ) : (
-              <Text style={styles.name}>{userData?.username}</Text>
-            )}
-
-            <Text style={styles.memberStatus}>Active Member</Text>
-          </View>
-
-          <TouchableOpacity style={styles.editButton} onPress={handleEditPress}>
-            <MaterialIcons
-              name={isEditing ? "save" : "edit"}
-              size={20}
-              color="#4285F4"
-            />
-            <Text style={styles.editText}>
-              {isEditing ? "Save Profile" : "Edit Profile"}
+        <View style={styles.headerRow}>
+          <Image
+            source={{ uri: auth?.profile?.profile_image }}
+            style={styles.profileImage}
+            resizeMode="cover"
+          />
+          <View style={{ flex: 1, marginLeft: 16 }}>
+            <Text style={styles.name}>
+              {profile.first_name} {profile.last_name}
             </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Email</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.email}
-                onChangeText={(text) => handleInputChange("email", text)}
-                keyboardType="email-address"
-              />
-            ) : (
-              <Text style={styles.infoValue}>{userData?.email}</Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Mobile</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.mobile}
-                onChangeText={(text) => handleInputChange("mobile", text)}
-                keyboardType="phone-pad"
-              />
-            ) : (
-              <Text style={styles.infoValue}>
-                {userData?.profile?.contact_number || "No Mobile in DB!!"}
-              </Text>
-            )}
+            <Text style={styles.username}>@{userData.username}</Text>
           </View>
         </View>
       </View>
 
+      {/* Personal Info Card */}
       <View style={styles.card}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shipping Address</Text>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>FullName</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.name}
-                onChangeText={(text) => handleInputChange("name", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>
-                {userData?.profile?.first_name} {userData?.profile?.last_name}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Address</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.address}
-                onChangeText={(text) => handleInputChange("address", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>{getUserAddress(userData)}</Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Postcode</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.postcode}
-                onChangeText={(text) => handleInputChange("postcode", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>{userData.postcode}</Text>
-            )}
-          </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>City–Maybunga</Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.infoValue, styles.input]}
-                value={userData.city}
-                onChangeText={(text) => handleInputChange("city", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>{userData.city}</Text>
-            )}
-          </View>
+        <Text style={styles.sectionTitle}>Personal Information</Text>
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Email</Text>
+          <Text style={styles.infoValue}>{userData.email}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Contact Number</Text>
+          <Text style={styles.infoValue}>{profile.contact_number || "-"}</Text>
         </View>
       </View>
 
+      {/* Shipping Address Card */}
       <View style={styles.card}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Previous Purchases</Text>
-
-          <View style={styles.productItem}>
-            <Text style={styles.productName}>Natural Face Serum</Text>
-            <Text style={styles.productPrice}>P1,299</Text>
-            <View style={styles.ratingContainer}>
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
+        <Text style={styles.sectionTitle}>Shipping Address</Text>
+        {addressDetails && addressDetails.length > 0 ? (
+          addressDetails.map((item, idx) => (
+            <View style={styles.infoItem} key={idx}>
+              <Text style={styles.infoLabel}>{item.label}</Text>
+              <Text style={styles.infoValue}>{item.value}</Text>
             </View>
-          </View>
+          ))
+        ) : (
+          <Text style={styles.infoValue}>
+            No address in stored user profile
+          </Text>
+        )}
+      </View>
 
-          <View style={styles.productItem}>
-            <Text style={styles.productName}>Eco Laundry Detergent</Text>
-            <Text style={styles.productPrice}>P449</Text>
-            <View style={styles.ratingContainer}>
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-            </View>
-          </View>
+      {/* Latest Transactions Card */}
+      <View style={styles.card}>
+        <View style={styles.recommendedHeader}>
+          <Text style={styles.sectionTitle}>Latest Transactions</Text>
         </View>
+        {latestTransactions.length === 0 ? (
+          <Text style={styles.infoValue}>No transactions found.</Text>
+        ) : (
+          latestTransactions.map((txn) => (
+            <View style={styles.transactionItem} key={txn.id}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <MaterialIcons
+                  name="receipt"
+                  size={20}
+                  color="#4285F4"
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={styles.transactionId}>Transaction #{txn.id}</Text>
+              </View>
+              <Text style={styles.transactionDate}>
+                {new Date(txn.created_at).toLocaleString()}
+              </Text>
+            </View>
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -292,44 +166,27 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  header: {
+  headerRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    paddingBottom: 20,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#eee",
   },
   name: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 2,
+    color: "#222",
   },
-  memberStatus: {
-    fontSize: 14,
-    color: "#4285F4",
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: "#666",
-  },
-  editButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#E8F0FE",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  editText: {
-    color: "#4285F4",
-    marginLeft: 4,
-    fontSize: 14,
-  },
-  section: {
-    marginTop: 10,
+  username: {
+    fontSize: 15,
+    color: "#888",
+    marginBottom: 2,
   },
   sectionTitle: {
     fontSize: 16,
@@ -338,133 +195,39 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   infoItem: {
-    marginBottom: 15,
+    marginBottom: 10,
   },
   infoLabel: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   infoValue: {
     fontSize: 16,
     color: "#333",
   },
-  activityItem: {
+  transactionItem: {
     marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingBottom: 8,
   },
-  activityStatus: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  activityText: {
-    fontSize: 14,
-    color: "#333",
-    marginLeft: 8,
-  },
-  activityDetail: {
-    fontSize: 14,
-    color: "#666",
-    marginLeft: 28,
-    marginBottom: 2,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: "#999",
-    marginLeft: 28,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-    marginVertical: 15,
-  },
-  productItem: {
-    marginBottom: 20,
-  },
-  productName: {
+  transactionId: {
     fontSize: 15,
     fontWeight: "500",
     color: "#333",
-    marginBottom: 4,
   },
-  productPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 6,
-  },
-  ratingContainer: {
-    flexDirection: "row",
+  transactionDate: {
+    fontSize: 13,
+    color: "#888",
+    marginLeft: 28,
+    marginTop: 2,
   },
   recommendedHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 15,
-  },
-  viewAllText: {
-    color: "#4285F4",
-    fontSize: 14,
-  },
-  dateInput: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#f9f9f9",
-  },
-  pickerContainer: {
-    marginTop: 10,
-  },
-  iosHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
-    backgroundColor: "#f5f5f5",
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-  },
-  cancelButton: {
-    padding: 8,
-  },
-  doneButton: {
-    padding: 8,
-  },
-  cancelText: {
-    color: "#888",
-    fontSize: 16,
-  },
-  doneText: {
-    color: "#4285F4",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  datePicker: {
-    backgroundColor: Platform.OS === "ios" ? "black" : "transparent",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
-    padding: 8,
-    backgroundColor: "#f9f9f9",
-  },
-  dropdown: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginTop: 4,
-    overflow: "visible",
-  },
-  dropdownOption: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
   loadingContainer: {
     flex: 1,

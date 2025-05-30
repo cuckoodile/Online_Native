@@ -133,10 +133,6 @@ export default function Index() {
       >
         <MyCarousel carouselData={carouselData} />
 
-        <Pressable onPress={() => handleRefetch()}>
-          <Text>Refetch</Text>
-        </Pressable>
-
         <View
           style={{
             paddingHorizontal: 10,
@@ -147,9 +143,9 @@ export default function Index() {
           <Text style={theme.text.title}>New Arrivals</Text>
 
           {(!productsLoading &&
-            products?.map((item) => (
-              <Card key={item.id} item={item} />
-            ))) || <Text>Loading....</Text>}
+            products?.map((item) => <Card key={item.id} item={item} />)) || (
+            <Text>Loading....</Text>
+          )}
         </View>
       </ScrollView>
     </View>

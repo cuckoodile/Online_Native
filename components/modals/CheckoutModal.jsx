@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Image } from "expo-image";
 import { usePostTransaction } from "../../functions/API/hooks/useTransaction";
+import CheckoutProductCard from "../cards/CheckoutProductCard";
 
 const PAYMENT_METHODS = [
   { key: "cod", label: "Cash on Delivery" },
@@ -141,57 +142,7 @@ export default function CheckoutModal({
             const total = price * quantity;
 
             return (
-              <View
-                key={index}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: "#f8f8f8",
-                  borderRadius: 10,
-                  marginBottom: 10,
-                  padding: 10,
-                }}
-              >
-                {img ? (
-                  <Image
-                    source={{ uri: img }}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 8,
-                      marginRight: 10,
-                      backgroundColor: "#eee",
-                    }}
-                    contentFit="cover"
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundColor: "#eee",
-                      borderRadius: 8,
-                      marginRight: 10,
-                    }}
-                  />
-                )}
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    {item?.product?.name}
-                  </Text>
-                  <Text style={{ color: "#888", fontSize: 13 }}>
-                    {item?.product?.category_name}
-                  </Text>
-                  <Text style={{ color: "#333", fontSize: 13 }}>
-                    ₱{price.toFixed(2)} x {quantity}
-                  </Text>
-                </View>
-                <View style={{ alignItems: "flex-end" }}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    ₱{total.toFixed(2)}
-                  </Text>
-                </View>
-              </View>
+              <CheckoutProductCard key={item.id} item={item} img={img} price={price} quantity={quantity} total={total}/>
             );
           })}
 

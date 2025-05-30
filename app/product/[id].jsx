@@ -14,31 +14,21 @@ import {
 import { useTheme } from "react-native-paper";
 import { BASE_URL } from "../../functions/API/config";
 import { useQuery } from "@tanstack/react-query";
-
-const fetchProducts = async (id) => {
-  console.log(`Fetching product from: ${BASE_URL}/api/products/${id}`);
-  
-  try {
-    const response = await fetch(`${BASE_URL}/api/products/${id}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch product id: ${id}`)
-    }
-
-    const res = await JSON.parse(response);
-
-    console.log(`Fetch response from product id: ${id} \n ${res}`);
-    return res.data;
-  } catch (error) {
-    console.error(`Failed to fetch product id: ${id} \n ${error.message}`);
-    throw new Error(`Failed to fetch product id: ${id}`);
-  }
-};
+import { useGetProductById } from "../../functions/API/hooks/useProduct";
+import { Image as ExpoImage } from "expo-image";
+import CommentCard from "../../components/cards/CommentCard";
+import ProductReviewCard from "../../components/cards/ProductReviewCard";
+import { useAddToCart } from "../../functions/API/hooks/useCart";
+import { useSelector } from "react-redux";
+import AddToCartModal from "../../components/modals/AddToCartModal";
 
 export default function Product() {
   const theme = useTheme();
   const { id } = useLocalSearchParams();
+  const auth = useSelector((state) => state.auth.user) ?? null;
   const [selectedImage, setSelectedImage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [showAddToCart, setShowAddToCart] = useState(false);
 
   const {
     data: product,
@@ -47,50 +37,14 @@ export default function Product() {
     error,
     refetch,
     isRefetching,
-  } = useQuery({
-    queryKey: ["products", id],
-    queryFn: () => fetchProducts(id),
-    staleTime: 1000 * 60 * 5,
-  });
+  } = useGetProductById(id);
+
+  const [quantity, setQuantity] = useState(1);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     refetch().finally(() => setRefreshing(false));
   }, []);
-
-  const productImages = product?.product_image
-    ? (() => {
-        try {
-          const parsed = JSON.parse(product.product_image);
-          return Array.isArray(parsed) ? parsed : [parsed];
-        } catch (error) {
-          console.error("Error parsing product images:", error);
-          return [];
-        }
-      })()
-    : [];
-
-  const currentImage = productImages[selectedImage] || null;
-
-  const renderObjectValue = (value) => {
-    if (typeof value === "object" && value !== null) {
-      if (value.created_at || value.updated_at) {
-        return value.created_at
-          ? new Date(value.created_at).toLocaleDateString()
-          : "";
-      }
-      return JSON.stringify(value);
-    }
-    return value;
-  };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   if (isError) {
     return (
@@ -105,18 +59,83 @@ export default function Product() {
     );
   }
 
-  if (!product) {
+  if (isLoading) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Product not found</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#43a047" />
       </View>
     );
   }
+
+  if (!product) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>No product found.</Text>
+      </View>
+    );
+  }
+
+  // Product images
+  const images = product.product_image || [];
+  const mainImage = images[selectedImage] || images[0];
+
+  // Product specifications (flatten details)
+  let specifications = [];
+  if (
+    Array.isArray(product.product_specifications) &&
+    product.product_specifications.length > 0
+  ) {
+    const details = product.product_specifications[0]?.details || {};
+    specifications = Object.values(details).filter((v) =>
+      typeof v === "object" ? Object.keys(v).length > 0 : true
+    );
+  }
+
+  // Product comments
+  const comments = product.product_comments || [];
+
+  // Helper to render stars
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Text
+          key={i}
+          style={{ color: i <= rating ? "#FFD700" : "#ccc", fontSize: 16 }}
+        >
+          ★
+        </Text>
+      );
+    }
+    return (
+      <View style={{ flexDirection: "row", marginBottom: 2 }}>{stars}</View>
+    );
+  };
+
+  // Helper to format comment date
+  const formatCommentDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <View
       style={[styles.container, { backgroundColor: theme.background.primary }]}
     >
+      {/* Add To Cart Modal */}
+      <AddToCartModal
+        visible={showAddToCart}
+        onClose={setShowAddToCart}
+        product={product}
+        selectedImageIdx={selectedImage}
+        quantity={quantity}
+        auth={auth}
+        setQuantity={setQuantity}
+      />
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -124,49 +143,136 @@ export default function Product() {
             onRefresh={onRefresh}
           />
         }
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 30 }}
       >
+        {/* Main Image */}
         <View style={styles.mainImageContainer}>
-          {currentImage ? (
-            <Image
-              source={{ uri: currentImage }}
-              style={styles.mainImage}
-              resizeMode="contain"
+          {mainImage ? (
+            <ExpoImage
+              source={mainImage}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="contain"
             />
           ) : (
             <View style={styles.imagePlaceholder}>
-              <Text>No Image Available</Text>
+              <Text>No Image</Text>
             </View>
           )}
         </View>
-
-        {productImages.length > 1 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.thumbnailContainer}
-          >
-            {productImages.map((image, index) => (
-              <Pressable
-                key={index}
-                onPress={() => setSelectedImage(index)}
-                style={[
-                  styles.thumbnail,
-                  selectedImage === index && styles.selectedThumbnail,
-                ]}
-              >
-                <Image
-                  source={{ uri: image }}
-                  style={styles.thumbnailImage}
-                  resizeMode="cover"
-                />
-              </Pressable>
-            ))}
-          </ScrollView>
-        )}
-
+        {/* Thumbnails */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.thumbnailContainer}
+        >
+          {images.map((img, idx) => (
+            <Pressable
+              key={idx}
+              onPress={() => setSelectedImage(idx)}
+              style={[
+                styles.thumbnail,
+                selectedImage === idx && styles.selectedThumbnail,
+              ]}
+            >
+              <ExpoImage
+                source={img}
+                style={styles.thumbnailImage}
+                contentFit="cover"
+              />
+            </Pressable>
+          ))}
+        </ScrollView>
+        {/* Product Details */}
         <View style={styles.detailsContainer}>
-
+          <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 6 }}>
+            {product.name}
+          </Text>
+          <Text
+            style={{ color: "#43a047", fontWeight: "bold", marginBottom: 6 }}
+          >
+            {product.category_name}
+          </Text>
+          <Text style={{ fontSize: 16, color: "#333", marginBottom: 10 }}>
+            {product.description}
+          </Text>
+          <Text style={{ fontSize: 15, color: "#888", marginBottom: 4 }}>
+            Available Stock:{" "}
+            <Text style={{ color: "#43a047", fontWeight: "bold" }}>
+              {product.stock}
+            </Text>
+          </Text>
+          {/* Specifications */}
+          {specifications.length > 0 && (
+            <View style={{ marginBottom: 12 }}>
+              <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+                Specifications:
+              </Text>
+              {specifications.map((spec, idx) => (
+                <View key={idx} style={{ marginLeft: 8, marginBottom: 2 }}>
+                  {Object.entries(spec).map(([k, v]) => (
+                    <Text key={k} style={{ color: "#555", fontSize: 14 }}>
+                      • {k}: {v}
+                    </Text>
+                  ))}
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+        {/* Comments Section */}
+        <View style={{ marginHorizontal: 20, marginTop: 10, marginBottom: 20 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 8 }}>
+            Customer Reviews
+          </Text>
+          {/* Review Summary */}
+          <ProductReviewCard comments={comments} />
+          {comments.length === 0 ? (
+            <Text style={{ color: "#888", fontSize: 15 }}>No reviews yet.</Text>
+          ) : (
+            comments.map((c, idx) => {
+              const user = c.user;
+              const profileImg = user?.profile?.profile_image
+                ? user.profile.profile_image.startsWith("http")
+                  ? user.profile.profile_image
+                  : `${BASE_URL.replace(
+                      /\/$/,
+                      ""
+                    )}/${user.profile.profile_image.replace(/^\//, "")}`
+                : null;
+              return (
+                <CommentCard
+                  key={c.id}
+                  profileImg={profileImg}
+                  username={user?.username || `User #${c.user_id}`}
+                  date={formatCommentDate(c.created_at)}
+                  rating={c.rating}
+                  comment={c.comment}
+                />
+              );
+            })
+          )}
+        </View>
+        {/* Action Buttons */}
+        <View
+          style={{
+            marginHorizontal: 20,
+            marginTop: 10,
+          }}
+        >
+          <Pressable
+            style={{
+              width: "100%",
+              backgroundColor: "#43a047",
+              borderRadius: 8,
+              padding: 14,
+              alignItems: "center",
+            }}
+            onPress={() => setShowAddToCart(true)}
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 17 }}>
+              Add to Cart
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>

@@ -51,7 +51,6 @@ const getCartAPI = async (id, token) => {
 
 // Update cart item quantity API
 const updateCartQuantityAPI = async ({ token, itemId, quantity }) => {
-
   if (!token) {
     throw new Error("User is not authenticated");
   }
@@ -91,4 +90,98 @@ export const useUpdateCartQuantity = () => {
       console.log("Cart updated successfully");
     },
   });
+};
+
+export const useAddToCart = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data) => postAddToCartAPI(data),
+    onSuccess: (res) => {
+      console.log("Item added to cart successfully:", res);
+      queryClient.invalidateQueries(["carts"]);
+    },
+    retry: false,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+const postAddToCartAPI = async (data) => {
+  console.log("CART API DATA: ", data);
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/carts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${data?.auth?.token}`,
+      },
+      body: JSON.stringify({
+        user_id: data?.auth?.id,
+        product_id: data?.product_id,
+        quantity: data?.quantity,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error adding item to cart");
+    }
+
+    const res = await response.json();
+
+    console.log("CART API DATA RESPONSE: ", res);
+    return res.data;
+  } catch (error) {
+    console.error("Add to Cart Error:", error);
+    throw new Error("Failed to add item to cart!");
+  }
+};
+
+export const useDeleteCartItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data) => deleteCartItemAPI(data),
+    onSuccess: (res) => {
+      console.log("Item deleted from cart successfully:", res);
+      queryClient.invalidateQueries(["carts"]);
+    },
+    retry: false,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+const deleteCartItemAPI = async (data) => {
+  console.log("CART API DATA: ", data);
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/carts`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${data?.token}`,
+      },
+      body: JSON.stringify({
+        ids: data?.cart_ids,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error deleting item from cart");
+    }
+
+    const res = await response.json();
+
+    console.log("CART API DATA RESPONSE: ", res);
+    return res.data;
+  } catch (error) {
+    console.error("Delete Cart Item Error:", error);
+    throw new Error("Failed to delete item from cart!");
+  }
 };

@@ -11,7 +11,10 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import UserAuth from "../../../components/higher-order-components/UserAuth";
-import { useGetCart } from "../../../functions/API/hooks/useCart";
+import {
+  useDeleteCartItem,
+  useGetCart,
+} from "../../../functions/API/hooks/useCart";
 import CartProductCard from "../../../components/cards/CartProductCard";
 import { Pressable } from "react-native";
 import CheckoutModal from "../../../components/modals/CheckoutModal";
@@ -19,6 +22,8 @@ import CheckoutModal from "../../../components/modals/CheckoutModal";
 const ShoppingCartScreen = () => {
   const navigation = useNavigation();
   const auth = useSelector((state) => state.auth.user) ?? null;
+
+  const removeCartMutation = useDeleteCartItem();
   const { data, isLoading, isError, refetch } = useGetCart(
     auth?.id,
     auth?.token
@@ -37,6 +42,25 @@ const ShoppingCartScreen = () => {
       setRefreshing(false);
     }, 500);
   }, []);
+
+  const handleRemoveCartItem = () => {
+    // Get all selected cart item IDs
+    const selectedIds = Object.keys(checkedItems).filter(
+      (id) => checkedItems[id]
+    );
+    if (selectedIds.length === 0) return;
+    const deleteData = {
+      token: auth?.token,
+      cart_ids: selectedIds, // pass as array for multiple deletion
+    };
+    console.log("Removing cart items:", deleteData);
+    removeCartMutation.mutate(deleteData, {
+      onSuccess: () => {
+        alert("Cart item(s) removed successfully");
+        setCheckedItems({});
+      },
+    });
+  };
 
   if (isLoading) {
     return (
@@ -138,13 +162,40 @@ const ShoppingCartScreen = () => {
             You've qualified for free shipping!
           </Text>
         </View>
-        <Pressable
-          android_ripple={{ color: "black" }}
-          onPress={() => setModalVisible(true)}
-          style={styles.checkoutButton}
-        >
-          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
+          <Pressable
+            android_ripple={{ color: "black" }}
+            onPress={() => handleRemoveCartItem()}
+            style={[
+              styles.checkoutButton,
+              {
+                flex: 1,
+                backgroundColor:
+                  checkedProducts.length === 0 ? "#bdbdbd" : "#e53935",
+              },
+            ]}
+            disabled={checkedProducts.length === 0}
+          >
+            <Text style={[styles.checkoutButtonText, { color: "white" }]}>
+              Remove Selected
+            </Text>
+          </Pressable>
+          <Pressable
+            android_ripple={{ color: "black" }}
+            onPress={() => setModalVisible(true)}
+            style={[
+              styles.checkoutButton,
+              {
+                flex: 1,
+                backgroundColor:
+                  checkedProducts.length === 0 ? "#bdbdbd" : "#4285F4",
+              },
+            ]}
+            disabled={checkedProducts.length === 0}
+          >
+            <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+          </Pressable>
+        </View>
       </ScrollView>
 
       {/* Modal */}
