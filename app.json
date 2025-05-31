@@ -8,26 +8,25 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "backgroundColor": "#084c3c",      
-
-   "splash": {
-      "image": "./assets/images/devsix.jpg",  
-      "backgroundColor": "#084c3c",      
+    "backgroundColor": "#084c3c",
+    "splash": {
+      "image": "./assets/images/devsix.jpg",
+      "backgroundColor": "#084c3c",
       "resizeMode": "contain",
       "imageWidth": 200
     },
-
     "ios": {
       "supportsTablet": true,
-      "image": "./assets/images/devsix.jpg",  
-      "backgroundColor": "#084c3c",      
+      "image": "./assets/images/devsix.jpg",
+      "backgroundColor": "#084c3c",
       "resizeMode": "contain",
       "imageWidth": 200
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/devsix2.png"
-      }
+      },
+      "package": "com.anonymous.DevSixTech"
     },
     "web": {
       "bundler": "metro",

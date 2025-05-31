@@ -1,23 +1,42 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
+import { usePostUser } from "../functions/API/hooks/useUser";
 
 const RegisterScreen = () => {
+  const postUserMutation = usePostUser();
+
   const [data, setData] = useState({
-    fullName: "",
+    first_name: "",
+    last_name: "",
+    username: "",
     email: "",
+    contact_number: "",
     password: "",
     confirmPassword: "",
+    is_admin: 0,
   });
 
   const handleRegister = () => {
-    console.log("Registering with:", { data });
+    if (data.password !== data.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    // Remove confirmPassword before sending data
+    const { confirmPassword, ...registerData } = data;
+    console.log("Registering with:", registerData);
+
+    postUserMutation.mutate(registerData, {
+      onSuccess: (response) => {
+        console.log("User registered successfully:", response);
+        alert("Registration successful! Please log in.");
+        router.replace("login");
+      },
+      onError: (error) => {
+        console.error("Error registering user:", error);
+        alert("Registration failed. Please try again.");
+      },
+    })
   };
 
   const handleNavigation = (path) => {
@@ -30,11 +49,23 @@ const RegisterScreen = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Full Name"
-        value={data.fullName}
-        onChangeText={(text) => setData({ ...data, fullName: text })}
+        placeholder="First Name"
+        value={data.first_name}
+        onChangeText={(text) => setData({ ...data, first_name: text })}
       />
-
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={data.last_name}
+        onChangeText={(text) => setData({ ...data, last_name: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={data.username}
+        onChangeText={(text) => setData({ ...data, username: text })}
+        autoCapitalize="none"
+      />
       <TextInput
         style={styles.input}
         placeholder="Email address"
@@ -43,7 +74,13 @@ const RegisterScreen = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
+      <TextInput
+        style={styles.input}
+        placeholder="Contact Number"
+        value={data.contact_number}
+        onChangeText={(text) => setData({ ...data, contact_number: text })}
+        keyboardType="phone-pad"
+      />
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -51,7 +88,6 @@ const RegisterScreen = () => {
         onChangeText={(text) => setData({ ...data, password: text })}
         secureTextEntry
       />
-
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"

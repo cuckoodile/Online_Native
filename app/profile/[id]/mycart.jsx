@@ -78,6 +78,43 @@ const ShoppingCartScreen = () => {
     );
   }
 
+  // Show empty cart UI if data is fetched but empty
+  if (Array.isArray(data) && data.length === 0 && !isLoading && !isError) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { flex: 1, justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 12 }}>
+          Your cart is empty
+        </Text>
+        <Text style={{ fontSize: 16, color: "#888", marginBottom: 24 }}>
+          Looks like you haven't added anything yet.
+        </Text>
+        <Pressable
+          style={{
+            backgroundColor: "#4285F4",
+            padding: 14,
+            borderRadius: 8,
+          }}
+          onPress={() => navigation.navigate("allproducts")}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: 16,
+            }}
+          >
+            Shop Now
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   // Only include checked items in subtotal/total
   const checkedProducts = Array.isArray(data)
     ? data.filter((item) => checkedItems[item.id])

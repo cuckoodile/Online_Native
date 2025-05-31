@@ -38,7 +38,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
       }}
     >
       <Pressable style={{ padding: 5 }} onPress={() => handleNavigation("/")}>
-        <Text>DevSix</Text>
+        <Text style={{color: "white"}}>DevSix</Text>
       </Pressable>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
@@ -51,7 +51,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
         <Ionicons
           name={netInfo.isConnected ? "wifi-outline" : "cloud-offline-outline"}
           size={27}
-          color="black"
+          color="white"
         />
 
         <Pressable
@@ -63,7 +63,7 @@ const Header = ({ isDarkMode, setDarkMode }) => {
               : handleNavigation("login")
           }
         >
-          <Ionicons name="cart-outline" size={27} color="black" />
+          <Ionicons name="cart-outline" size={27} color="white" />
         </Pressable>
         <Pressable
           style={{ padding: 5 }}
@@ -74,14 +74,14 @@ const Header = ({ isDarkMode, setDarkMode }) => {
               : handleNavigation("login")
           }
         >
-          <Ionicons name="person-circle-outline" size={27} color="black" />
+          <Ionicons name="person-circle-outline" size={27} color="white" />
         </Pressable>
         <Pressable
           style={{ padding: 5 }}
           android_ripple={{ color: "grey" }}
           onPress={() => setSidebarOpen(!isSidebarOpen)}
         >
-          <Ionicons name="menu" size={27} color="black" />
+          <Ionicons name="menu" size={27} color="white" />
         </Pressable>
       </View>
 

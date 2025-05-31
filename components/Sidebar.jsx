@@ -94,7 +94,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
           },
         ]}
       >
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+        <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
           Sidebar Navigations
         </Text>
         <View style={{ gap: 5 }}>
@@ -103,7 +103,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
               handleNavigation("");
             }}
           >
-            <Text>Home</Text>
+            <Text style={{color: "white"}}>Home</Text>
           </Pressable>
 
           <Pressable
@@ -111,7 +111,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
               handleNavigation("allproducts");
             }}
           >
-            <Text>All Products</Text>
+            <Text style={{color: "white"}}>All Products</Text>
           </Pressable>
 
           <Pressable
@@ -123,7 +123,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
               }
             }}
           >
-            <Text>My Cart</Text>
+            <Text style={{color: "white"}}>My Cart</Text>
           </Pressable>
 
           <Pressable
@@ -135,7 +135,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
               }
             }}
           >
-            <Text>My Purchase</Text>
+            <Text style={{color: "white"}}>My Purchase</Text>
           </Pressable>
 
           <Link
@@ -145,12 +145,12 @@ export default function Sidebar({ onOpenChange, isOpen }) {
             }}
             onPress={() => onOpenChange(false)}
           >
-            <Text>Profile</Text>
+            <Text style={{color: "white"}}>Profile</Text>
           </Link>
 
           {auth ? (
             <Pressable onPress={handleLogOut}>
-              <Text>Log Out</Text>
+              <Text style={{color: "white"}}>Log Out</Text>
             </Pressable>
           ) : (
             <Pressable
@@ -158,7 +158,7 @@ export default function Sidebar({ onOpenChange, isOpen }) {
                 handleNavigation("login");
               }}
             >
-              <Text>Log In</Text>
+              <Text style={{color: "white"}}>Log In</Text>
             </Pressable>
           )}
         </View>
